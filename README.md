@@ -14,14 +14,14 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a6c, #2a3c78);
+            background: linear-gradient(135deg, #0a1929, #1a3658);
             color: white;
             overflow: hidden;
             height: 100vh;
         }
 
         header {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -29,6 +29,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             z-index: 1000;
             position: relative;
+            border-bottom: 2px solid #ff8a00;
         }
 
         h1 {
@@ -90,7 +91,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 999;
             transition: opacity 0.5s ease;
         }
@@ -102,6 +103,7 @@
         #startScreen {
             text-align: center;
             padding: 20px;
+            background: radial-gradient(circle at center, #1a2a6c, #0a1929);
         }
 
         #startScreen h2 {
@@ -118,11 +120,13 @@
             margin-bottom: 30px;
             max-width: 600px;
             line-height: 1.6;
+            color: #ccc;
         }
 
         #startGameBtn {
             font-size: 22px;
             padding: 15px 40px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
         }
 
         #gameScreen {
@@ -138,9 +142,22 @@
             background: #0a0a0a;
         }
 
+        .game-map {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+                linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+                linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            position: relative;
+        }
+
         #controlPanel {
             width: 350px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             padding: 20px;
             overflow-y: auto;
             border-left: 2px solid #333;
@@ -151,6 +168,8 @@
             text-align: center;
             color: #ff8a00;
             font-size: 22px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
         }
 
         .info-section {
@@ -158,11 +177,13 @@
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
+            border: 1px solid #333;
         }
 
         .info-section h4 {
             margin-bottom: 10px;
             color: #4CAF50;
+            font-size: 18px;
         }
 
         .plane-item {
@@ -173,6 +194,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid #333;
         }
 
         .plane-info {
@@ -197,8 +219,16 @@
             font-size: 14px;
         }
 
-        .leaflet-container {
-            background: #0a0a0a;
+        .country-ukraine {
+            fill: rgba(0, 87, 183, 0.3);
+            stroke: #0057b7;
+            stroke-width: 2;
+        }
+
+        .country-russia {
+            fill: rgba(255, 255, 255, 0.3);
+            stroke: #fff;
+            stroke-width: 2;
         }
 
         .city-marker {
@@ -207,6 +237,13 @@
             width: 8px;
             height: 8px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .city-marker:hover {
+            transform: scale(1.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 1);
         }
 
         .airport-marker {
@@ -215,6 +252,7 @@
             width: 12px;
             height: 12px;
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+            cursor: pointer;
         }
 
         .plane-marker {
@@ -222,6 +260,12 @@
             height: 24px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff8a00"><path d="M20.56 3.91c.59.59.59 1.54 0 2.12l-4.95 4.95 2.12 5.66-2.83 2.83-1.41-5.65-4.95 4.95-.7-.7 4.95-4.95L9.3 8.1l2.83-2.83 5.66 2.12 4.95-4.95c.58-.58 1.53-.58 2.12 0z"/></svg>') no-repeat center;
             background-size: contain;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .plane-marker:hover {
+            transform: scale(1.2);
         }
 
         .plane-path {
@@ -229,6 +273,18 @@
             stroke-width: 2;
             stroke-dasharray: 5, 5;
             fill: none;
+        }
+
+        .city-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            border: 1px solid #333;
         }
 
         .notification {
@@ -247,6 +303,16 @@
 
         .notification.show {
             transform: translateX(0);
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
         }
 
         @media (max-width: 768px) {
@@ -290,7 +356,14 @@
     <!-- Ігровий екран -->
     <div id="gameScreen" class="screen hidden">
         <!-- Карта -->
-        <div id="map"></div>
+        <div id="map" class="game-map">
+            <div class="map-overlay">
+                <strong>Карта України та Росії</strong><br>
+                <span style="color: #0057b7">■ Україна</span><br>
+                <span style="color: white">■ Росія</span>
+            </div>
+            <!-- SVG карта буде додана через JavaScript -->
+        </div>
 
         <!-- Панель управління -->
         <div id="controlPanel">
@@ -337,7 +410,6 @@
     <!-- Сповіщення -->
     <div id="notification" class="notification"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // Дані гри
         const gameData = {
@@ -345,16 +417,16 @@
             income: 70000,
             incomeInterval: 3000, // 3 секунди
             cities: [
-                { id: 1, name: "Київ", country: "ua", population: 2884000, lat: 50.4501, lng: 30.5234 },
-                { id: 2, name: "Харків", country: "ua", population: 1441000, lat: 49.9935, lng: 36.2304 },
-                { id: 3, name: "Одеса", country: "ua", population: 1017000, lat: 46.4825, lng: 30.7233 },
-                { id: 4, name: "Львів", country: "ua", population: 724000, lat: 49.8397, lng: 24.0297 },
-                { id: 5, name: "Дніпро", country: "ua", population: 966000, lat: 48.4647, lng: 35.0462 },
-                { id: 6, name: "Москва", country: "ru", population: 12655000, lat: 55.7558, lng: 37.6173 },
-                { id: 7, name: "Санкт-Петербург", country: "ru", population: 5398000, lat: 59.9343, lng: 30.3351 },
-                { id: 8, name: "Новосибірськ", country: "ru", population: 1620000, lat: 55.0084, lng: 82.9357 },
-                { id: 9, name: "Єкатеринбург", country: "ru", population: 1495000, lat: 56.8389, lng: 60.6057 },
-                { id: 10, name: "Казань", country: "ru", population: 1257000, lat: 55.7964, lng: 49.1089 }
+                { id: 1, name: "Київ", country: "ua", population: 2884000, x: 45, y: 35 },
+                { id: 2, name: "Харків", country: "ua", population: 1441000, x: 55, y: 30 },
+                { id: 3, name: "Одеса", country: "ua", population: 1017000, x: 35, y: 50 },
+                { id: 4, name: "Львів", country: "ua", population: 724000, x: 30, y: 25 },
+                { id: 5, name: "Дніпро", country: "ua", population: 966000, x: 52, y: 40 },
+                { id: 6, name: "Москва", country: "ru", population: 12655000, x: 60, y: 20 },
+                { id: 7, name: "Санкт-Петербург", country: "ru", population: 5398000, x: 55, y: 10 },
+                { id: 8, name: "Новосибірськ", country: "ru", population: 1620000, x: 85, y: 25 },
+                { id: 9, name: "Єкатеринбург", country: "ru", population: 1495000, x: 70, y: 20 },
+                { id: 10, name: "Казань", country: "ru", population: 1257000, x: 65, y: 25 }
             ],
             planes: {
                 f16: { name: "F-16 Fighting Falcon", price: 1700000, speed: "Макс. 2,170 км/год" },
@@ -374,6 +446,7 @@
         const startGameBtn = document.getElementById('startGameBtn');
         const playButton = document.getElementById('playButton');
         const moneyDisplay = document.getElementById('moneyDisplay');
+        const mapContainer = document.getElementById('map');
         const cityInfo = document.getElementById('cityInfo');
         const cityName = document.getElementById('cityName');
         const cityPopulation = document.getElementById('cityPopulation');
@@ -392,12 +465,13 @@
         const incomeTimer = document.getElementById('incomeTimer');
         const notification = document.getElementById('notification');
 
-        // Карта Leaflet
-        let map;
+        // Елементи карти
+        let svgMap;
         let cityMarkers = [];
         let airportMarkers = [];
         let planeMarkers = [];
         let planePaths = [];
+        let tooltip = null;
 
         // Ініціалізація гри
         function initGame() {
@@ -422,33 +496,82 @@
 
         // Ініціалізація карти
         function initMap() {
-            // Створення карти з чорним фоном
-            map = L.map('map', {
-                center: [50.4501, 30.5234], // Київ
-                zoom: 6,
-                minZoom: 4,
-                maxZoom: 10,
-                zoomControl: false
-            });
+            // Створення SVG карти
+            svgMap = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgMap.setAttribute("width", "100%");
+            svgMap.setAttribute("height", "100%");
+            svgMap.style.cursor = "grab";
             
-            // Додаємо контрол зумірования
-            L.control.zoom({
-                position: 'topright'
-            }).addTo(map);
+            // Додавання контурів України
+            const ukraine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            ukraine.setAttribute("class", "country-ukraine");
+            ukraine.setAttribute("d", "M30,25 L40,30 L50,35 L55,40 L60,45 L55,50 L50,55 L45,60 L40,55 L35,50 L30,45 L25,40 L20,35 Z");
+            svgMap.appendChild(ukraine);
             
-            // Додаємо можливість переміщення карти правою кнопкою миші
-            map.dragging.disable();
-            map.on('mousedown', function(e) {
-                if (e.originalEvent.button === 2) { // Права кнопка миші
-                    map.dragging.enable();
-                    setTimeout(() => map.dragging.disable(), 1000);
+            // Додавання контурів Росії
+            const russia = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            russia.setAttribute("class", "country-russia");
+            russia.setAttribute("d", "M55,10 L65,15 L75,20 L85,25 L90,30 L85,35 L80,40 L75,35 L70,30 L65,25 L60,20 L55,15 Z");
+            svgMap.appendChild(russia);
+            
+            // Додавання SVG до контейнера
+            mapContainer.appendChild(svgMap);
+            
+            // Додавання обробників подій для переміщення карти
+            let isDragging = false;
+            let startX, startY;
+            let translateX = 0, translateY = 0;
+            let scale = 1;
+            
+            svgMap.addEventListener('mousedown', (e) => {
+                if (e.button === 2) { // Права кнопка миші
+                    isDragging = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                    svgMap.style.cursor = 'grabbing';
                 }
             });
             
+            svgMap.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    svgMap.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+            });
+            
+            svgMap.addEventListener('mouseup', () => {
+                isDragging = false;
+                svgMap.style.cursor = 'grab';
+            });
+            
+            svgMap.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = -e.deltaY / 1000;
+                scale = Math.min(Math.max(0.5, scale + delta), 3);
+                svgMap.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            });
+            
+            // Заборонити контекстне меню
+            svgMap.addEventListener('contextmenu', (e) => e.preventDefault());
+            
             // Для мобільних пристроїв
-            map.on('touchstart', function() {
-                map.dragging.enable();
-                setTimeout(() => map.dragging.disable(), 1000);
+            svgMap.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            });
+            
+            svgMap.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    translateX = e.touches[0].clientX - startX;
+                    translateY = e.touches[0].clientY - startY;
+                    svgMap.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+            });
+            
+            svgMap.addEventListener('touchend', () => {
+                isDragging = false;
             });
         }
 
@@ -456,29 +579,50 @@
         function addCitiesToMap() {
             gameData.cities.forEach(city => {
                 // Створення маркера міста
-                const marker = L.circleMarker([city.lat, city.lng], {
-                    radius: 6,
-                    fillColor: 'white',
-                    color: 'white',
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).addTo(map);
+                const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                marker.setAttribute("class", "city-marker");
+                marker.setAttribute("cx", city.x);
+                marker.setAttribute("cy", city.y);
+                marker.setAttribute("r", 4);
+                marker.setAttribute("data-city-id", city.id);
                 
-                // Додавання спливаючої підказки
-                marker.bindTooltip(city.name, {
-                    permanent: false,
-                    direction: 'top',
-                    offset: [0, -10]
+                // Додавання обробників подій
+                marker.addEventListener('mouseover', (e) => {
+                    showCityTooltip(e, city);
                 });
                 
-                // Обробник кліку на місті
-                marker.on('click', () => {
+                marker.addEventListener('mouseout', hideCityTooltip);
+                
+                marker.addEventListener('click', () => {
                     selectCity(city);
                 });
                 
+                svgMap.appendChild(marker);
                 cityMarkers.push(marker);
             });
+        }
+
+        // Показати підказку міста
+        function showCityTooltip(e, city) {
+            if (tooltip) {
+                tooltip.remove();
+            }
+            
+            tooltip = document.createElement('div');
+            tooltip.className = 'city-tooltip';
+            tooltip.textContent = `${city.name} (${city.country === 'ua' ? 'Україна' : 'Росія'})`;
+            tooltip.style.left = (e.clientX + 10) + 'px';
+            tooltip.style.top = (e.clientY - 30) + 'px';
+            
+            document.body.appendChild(tooltip);
+        }
+
+        // Сховати підказку міста
+        function hideCityTooltip() {
+            if (tooltip) {
+                tooltip.remove();
+                tooltip = null;
+            }
         }
 
         // Вибір міста
@@ -624,21 +768,18 @@
 
         // Додати маркер аеропорту на карту
         function addAirportMarker(city) {
-            const marker = L.circleMarker([city.lat, city.lng], {
-                radius: 8,
-                fillColor: '#4CAF50',
-                color: '#4CAF50',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(map);
+            const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            marker.setAttribute("class", "airport-marker");
+            marker.setAttribute("cx", city.x);
+            marker.setAttribute("cy", city.y);
+            marker.setAttribute("r", 6);
+            marker.setAttribute("data-city-id", city.id);
             
-            marker.bindTooltip(`Аеропорт ${city.name}`, {
-                permanent: false,
-                direction: 'top',
-                offset: [0, -10]
+            marker.addEventListener('click', () => {
+                selectCity(city);
             });
             
+            svgMap.appendChild(marker);
             airportMarkers.push(marker);
         }
 
@@ -671,8 +812,8 @@
                 type: planeType,
                 speed: planeData.speed,
                 baseCityId: gameData.selectedCity.id,
-                lat: gameData.selectedCity.lat,
-                lng: gameData.selectedCity.lng
+                x: gameData.selectedCity.x,
+                y: gameData.selectedCity.y
             };
             
             gameData.playerPlanes.push(plane);
@@ -688,25 +829,20 @@
 
         // Додати маркер літака на карту
         function addPlaneMarker(plane) {
-            const icon = L.divIcon({
-                className: 'plane-marker',
-                html: '',
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-            });
+            const marker = document.createElementNS("http://www.w3.org/2000/svg", "image");
+            marker.setAttribute("class", "plane-marker");
+            marker.setAttribute("x", plane.x - 12);
+            marker.setAttribute("y", plane.y - 12);
+            marker.setAttribute("width", 24);
+            marker.setAttribute("height", 24);
+            marker.setAttribute("href", 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff8a00"><path d="M20.56 3.91c.59.59.59 1.54 0 2.12l-4.95 4.95 2.12 5.66-2.83 2.83-1.41-5.65-4.95 4.95-.7-.7 4.95-4.95L9.3 8.1l2.83-2.83 5.66 2.12 4.95-4.95c.58-.58 1.53-.58 2.12 0z"/></svg>');
+            marker.setAttribute("data-plane-id", plane.id);
             
-            const marker = L.marker([plane.lat, plane.lng], { icon: icon }).addTo(map);
-            
-            marker.bindTooltip(plane.name, {
-                permanent: false,
-                direction: 'top',
-                offset: [0, -15]
-            });
-            
-            marker.on('click', () => {
+            marker.addEventListener('click', () => {
                 selectPlane(plane.id);
             });
             
+            svgMap.appendChild(marker);
             planeMarkers.push(marker);
         }
 
@@ -719,7 +855,8 @@
             stopDirectBtn.classList.remove('hidden');
             
             // Додати обробник кліку по карті
-            map.on('click', onMapClickForDirection);
+            svgMap.addEventListener('click', onMapClickForDirection);
+            svgMap.style.cursor = 'crosshair';
             
             showNotification("Натисніть на карту, щоб задати маршрут літаку");
         }
@@ -731,11 +868,12 @@
             stopDirectBtn.classList.add('hidden');
             
             // Видалити обробник кліку по карті
-            map.off('click', onMapClickForDirection);
+            svgMap.removeEventListener('click', onMapClickForDirection);
+            svgMap.style.cursor = 'grab';
             
             // Видалити лінію маршруту, якщо вона є
             if (planePaths.length > 0) {
-                planePaths.forEach(path => map.removeLayer(path));
+                planePaths.forEach(path => path.remove());
                 planePaths = [];
             }
         }
@@ -744,42 +882,38 @@
         function onMapClickForDirection(e) {
             if (!gameData.selectedPlane || !gameData.isDirecting) return;
             
-            const targetLat = e.latlng.lat;
-            const targetLng = e.latlng.lng;
+            const rect = svgMap.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             
             // Оновити позицію літака
             const plane = gameData.playerPlanes.find(p => p.id === gameData.selectedPlane.id);
             if (plane) {
-                plane.lat = targetLat;
-                plane.lng = targetLng;
+                plane.x = x;
+                plane.y = y;
                 
                 // Оновити маркер літака на карті
-                const planeMarker = planeMarkers.find(m => {
-                    const markerLat = m.getLatLng().lat;
-                    const markerLng = m.getLatLng().lng;
-                    return markerLat === plane.lat && markerLng === plane.lng;
-                });
-                
+                const planeMarker = planeMarkers.find(m => m.getAttribute('data-plane-id') == plane.id);
                 if (planeMarker) {
-                    planeMarker.setLatLng([targetLat, targetLng]);
+                    planeMarker.setAttribute('x', x - 12);
+                    planeMarker.setAttribute('y', y - 12);
                 }
                 
                 // Додати лінію маршруту
                 const baseCity = gameData.cities.find(c => c.id === plane.baseCityId);
                 if (baseCity) {
-                    const path = L.polyline([
-                        [baseCity.lat, baseCity.lng],
-                        [targetLat, targetLng]
-                    ], {
-                        color: '#ff8a00',
-                        weight: 2,
-                        dashArray: '5, 5'
-                    }).addTo(map);
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    path.setAttribute("class", "plane-path");
+                    path.setAttribute("x1", baseCity.x);
+                    path.setAttribute("y1", baseCity.y);
+                    path.setAttribute("x2", x);
+                    path.setAttribute("y2", y);
                     
+                    svgMap.appendChild(path);
                     planePaths.push(path);
                 }
                 
-                showNotification(`Літак направлено до координат: ${targetLat.toFixed(4)}, ${targetLng.toFixed(4)}`);
+                showNotification(`Літак направлено до нової позиції!`);
             }
             
             // Зупинити направлення після вибору точки
