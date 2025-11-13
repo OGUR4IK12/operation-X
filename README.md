@@ -1,480 +1,269 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operation X - War Sodium</title>
+    <title>Авіастратегія: Україна та Росія</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0c0c2d, #1a1a4a, #2d0c2d);
+            background: linear-gradient(135deg, #1a2a6c, #2a3c78);
             color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            background: rgba(10, 10, 40, 0.85);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(100, 0, 255, 0.5);
-            text-align: center;
-            border: 1px solid #4a00e0;
+            overflow: hidden;
+            height: 100vh;
         }
 
         header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #8e2de2;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            position: relative;
         }
 
         h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px #00f7ff, 0 0 25px #00f7ff;
-            color: #ffffff;
-            letter-spacing: 2px;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #8e2de2;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: #00f7ff;
-        }
-
-        .deepseek-info {
-            background: rgba(0, 247, 255, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #00f7ff;
-        }
-
-        .menu, .game-screen, .battle-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .difficulty-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        button {
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .play-btn {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
-            padding: 15px 50px;
-            font-size: 1.5rem;
-            border: none;
-            box-shadow: 0 0 15px rgba(142, 45, 226, 0.7);
-        }
-
-        .easy-btn {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-            border: none;
-        }
-
-        .medium-btn {
-            background: linear-gradient(to right, #ff9a00, #ff5e00);
-            border: none;
-        }
-
-        .hard-btn {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-            border: none;
-        }
-
-        .insane-btn {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            border: none;
-        }
-
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            font-size: 24px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .game-info {
             display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-
-        .blue-team, .red-team {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 20px;
         }
 
-        .blue-team {
-            background: rgba(0, 120, 255, 0.2);
-            border: 2px solid #0078ff;
-            box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
-        }
-
-        .red-team {
-            background: rgba(255, 0, 0, 0.2);
-            border: 2px solid #ff0000;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-
-        .soldier-count {
-            font-size: 1.8rem;
-            margin-top: 5px;
-            text-shadow: 0 0 5px currentColor;
-        }
-
-        .battlefield-container {
-            width: 100%;
-            height: 500px;
-            position: relative;
-            margin: 20px 0;
-            border: 3px solid #34495e;
-            border-radius: 10px;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #1a2a6c, #2d0c2d);
-        }
-
-        .battlefield {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .territory {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: width 2s ease;
-        }
-
-        .blue-territory {
-            left: 0;
-            background: rgba(0, 120, 255, 0.15);
-            width: 50%;
-        }
-
-        .red-territory {
-            right: 0;
-            background: rgba(255, 0, 0, 0.15);
-            width: 50%;
-        }
-
-        .front-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 8px;
-            background: linear-gradient(to bottom, #fdbb2d, #ff5e00);
-            left: 50%;
-            transform: translateX(-50%);
-            transition: all 3s ease;
-            box-shadow: 0 0 15px #fdbb2d;
-            z-index: 10;
-        }
-
-        .territory-label {
-            font-size: 1.5rem;
+        #moneyDisplay {
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 0 0 10px currentColor;
-            padding: 10px 20px;
-            border-radius: 5px;
+            color: #4CAF50;
             background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #4CAF50;
         }
 
-        .blue-label {
-            color: #00a8ff;
-        }
-
-        .red-label {
-            color: #ff3e3e;
-        }
-
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .recruit-btn {
-            background: linear-gradient(to right, #0072ff, #00c6ff);
+        button {
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
             color: white;
-            font-size: 1.2rem;
-            padding: 15px;
-            border-radius: 8px;
-            position: relative;
             border: none;
-            box-shadow: 0 0 10px rgba(0, 114, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .recruit-btn:disabled {
-            background: #7f8c8d;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        button:disabled {
+            background: #666;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        .recruit-btn:disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .countdown {
-            font-size: 1.5rem;
-            color: #fdbb2d;
-            margin: 10px 0;
-            text-shadow: 0 0 10px #fdbb2d;
-        }
-
-        .deployment-info {
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .deployment-sector {
-            flex: 1;
-            padding: 10px;
-            margin: 0 5px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sector-left {
-            border: 1px solid #00b09b;
-        }
-
-        .sector-center {
-            border: 1px solid #ff9a00;
-        }
-
-        .sector-right {
-            border: 1px solid #ff416c;
-        }
-
-        .battle-log {
-            width: 100%;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-            overflow-y: auto;
-            margin-top: 20px;
-            text-align: left;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .blue-text {
-            color: #00a8ff;
-        }
-
-        .red-text {
-            color: #ff3e3e;
-        }
-
-        .yellow-text {
-            color: #fdbb2d;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            transition: opacity 0.5s ease;
         }
 
         .hidden {
             display: none;
         }
 
-        .back-btn {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
-            margin-top: 20px;
-            border: none;
+        #startScreen {
+            text-align: center;
+            padding: 20px;
         }
 
-        .instructions {
-            margin-top: 20px;
+        #startScreen h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        #startScreen p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        #startGameBtn {
+            font-size: 22px;
+            padding: 15px 40px;
+        }
+
+        #gameScreen {
+            padding-top: 70px;
+            flex-direction: row;
+            align-items: stretch;
+            background: transparent;
+        }
+
+        #map {
+            flex: 1;
+            height: calc(100vh - 70px);
+            background: #0a0a0a;
+        }
+
+        #controlPanel {
+            width: 350px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 2px solid #333;
+        }
+
+        #controlPanel h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ff8a00;
+            font-size: 22px;
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.1);
             padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        .instructions h3 {
-            color: #fdbb2d;
+        .info-section h4 {
             margin-bottom: 10px;
+            color: #4CAF50;
         }
 
-        .instructions ul {
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        /* Стили для стрелок */
-        .arrow {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            cursor: pointer;
-            z-index: 20;
-            transition: all 0.3s ease;
-        }
-
-        .arrow:hover {
-            transform: scale(1.2);
-        }
-
-        .arrow-left {
-            left: 20%;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 15px 30px 15px 0;
-            border-color: transparent #00a8ff transparent transparent;
-        }
-
-        .arrow-center {
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border-width: 30px 0 30px 50px;
-            border-color: transparent transparent transparent #00a8ff;
-        }
-
-        .arrow-right {
-            right: 20%;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 15px 0 15px 30px;
-            border-color: transparent transparent transparent #00a8ff;
-        }
-
-        /* Модальное окно для ввода солдат */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 100;
-            justify-content: center;
+        .plane-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a4a, #2d0c2d);
-            padding: 30px;
-            border-radius: 15px;
-            width: 400px;
-            text-align: center;
-            border: 2px solid #8e2de2;
-            box-shadow: 0 0 30px rgba(142, 45, 226, 0.7);
-        }
-
-        .modal h3 {
-            margin-bottom: 20px;
-            color: #fdbb2d;
-        }
-
-        .modal input {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border: 1px solid #8e2de2;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            font-size: 1.2rem;
-            text-align: center;
-        }
-
-        .modal-buttons {
+        .plane-info {
             display: flex;
-            gap: 15px;
-            justify-content: center;
+            flex-direction: column;
         }
 
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .plane-name {
             font-weight: bold;
+            color: #ff8a00;
         }
 
-        .confirm-btn {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-            color: white;
+        .plane-stats {
+            font-size: 12px;
+            color: #aaa;
         }
 
-        .cancel-btn {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        .control-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .leaflet-container {
+            background: #0a0a0a;
+        }
+
+        .city-marker {
+            background: white;
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        .airport-marker {
+            background: #4CAF50;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.7);
+        }
+
+        .plane-marker {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff8a00"><path d="M20.56 3.91c.59.59.59 1.54 0 2.12l-4.95 4.95 2.12 5.66-2.83 2.83-1.41-5.65-4.95 4.95-.7-.7 4.95-4.95L9.3 8.1l2.83-2.83 5.66 2.12 4.95-4.95c.58-.58 1.53-.58 2.12 0z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+
+        .plane-path {
+            stroke: #ff8a00;
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            fill: none;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.9);
             color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .battlefield-container {
-                height: 400px;
-            }
-            
-            .game-info {
+            #gameScreen {
                 flex-direction: column;
-                gap: 10px;
             }
             
-            .deployment-info {
+            #controlPanel {
+                width: 100%;
+                height: 40vh;
+            }
+            
+            #map {
+                height: 60vh;
+            }
+            
+            header {
                 flex-direction: column;
                 gap: 10px;
             }
@@ -482,547 +271,570 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Меню -->
-        <div class="menu" id="menu">
-            <header>
-                <h1>OPERATION X</h1>
-                <h2>War Sodium - Тактическая битва</h2>
-                <p class="subtitle">Стратегическое сражение за территорию</p>
-            </header>
-            
-            <div class="deepseek-info">
-                Мини-игра создана на 96% с помощью DeepSeek
-            </div>
-            
-            <button class="play-btn" id="playBtn">Начать операцию</button>
-            
-            <div class="instructions">
-                <h3>Инструкция:</h3>
-                <ul>
-                    <li>Выберите уровень сложности</li>
-                    <li>Накопите солдат перед битвой (кнопка найма)</li>
-                    <li>Нажмите на стрелки для отправки войск на фронт</li>
-                    <li>Введите количество солдат для отправки</li>
-                    <li>Используйте тактические преимущества для окружения противника</li>
-                    <li>Захватите 90% территории для победы!</li>
-                </ul>
-            </div>
+    <!-- Меню сайту -->
+    <header>
+        <h1>Авіастратегія: Україна та Росія</h1>
+        <div class="game-info">
+            <span id="moneyDisplay">Гроші: $250,000</span>
+            <button id="playButton">Грати</button>
         </div>
+    </header>
 
-        <!-- Экран выбора сложности -->
-        <div class="game-screen hidden" id="gameScreen">
-            <h2>Выберите уровень сложности операции</h2>
-            <div class="difficulty-buttons">
-                <button class="easy-btn" data-difficulty="easy">Легкий (100K)</button>
-                <button class="medium-btn" data-difficulty="medium">Средний (300K)</button>
-                <button class="hard-btn" data-difficulty="hard">Сложный (600K)</button>
-                <button class="insane-btn" data-difficulty="insane">Хард (1M)</button>
-            </div>
-            <button class="back-btn" id="backToMenu">Назад в меню</button>
-        </div>
-
-        <!-- Экран битвы -->
-        <div class="battle-screen hidden" id="battleScreen">
-            <h2>OPERATION X - Активная фаза</h2>
-            
-            <div class="game-info">
-                <div class="blue-team">
-                    <div>СИНИЕ (ВАШИ СИЛЫ)</div>
-                    <div class="soldier-count" id="blueSoldiers">0</div>
-                    <div>солдат</div>
-                </div>
-                <div class="red-team">
-                    <div>КРАСНЫЕ (СИЛЫ ИИ)</div>
-                    <div class="soldier-count" id="redSoldiers">0</div>
-                    <div>солдат</div>
-                </div>
-            </div>
-
-            <div class="countdown" id="countdown">До начала битвы: 30</div>
-
-            <div class="battlefield-container">
-                <div class="battlefield" id="battlefield">
-                    <div class="territory blue-territory" id="blueTerritory">
-                        <div class="territory-label blue-label" id="blueLabel">0</div>
-                    </div>
-                    <div class="front-line" id="frontLine"></div>
-                    <div class="territory red-territory" id="redTerritory">
-                        <div class="territory-label red-label" id="redLabel">100,000</div>
-                    </div>
-                    
-                    <!-- Стрелки для управления войсками -->
-                    <div class="arrow arrow-left" id="arrowLeft"></div>
-                    <div class="arrow arrow-center" id="arrowCenter"></div>
-                    <div class="arrow arrow-right" id="arrowRight"></div>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="recruit-btn" id="recruitBtn">
-                    Мобилизовать солдат (+15K)
-                    <div>Перезарядка: <span id="cooldown">5</span> сек</div>
-                </button>
-
-                <div class="deployment-info">
-                    <div class="deployment-sector sector-left">
-                        <div>Левый фланг</div>
-                        <div id="deployLeft">0</div>
-                    </div>
-                    <div class="deployment-sector sector-center">
-                        <div>Центр</div>
-                        <div id="deployCenter">0</div>
-                    </div>
-                    <div class="deployment-sector sector-right">
-                        <div>Правый фланг</div>
-                        <div id="deployRight">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="battle-log" id="battleLog">
-                <div class="yellow-text">Операция начнется через 30 секунд. Мобилизуйте войска!</div>
-            </div>
-
-            <button class="back-btn" id="backToDifficulty">Прервать операцию</button>
-        </div>
+    <!-- Головний екран -->
+    <div id="startScreen" class="screen">
+        <h2>Ласкаво просимо до Авіастратегії!</h2>
+        <p>Побудуйте авіаційну імперію, створюючи аеропорти та купуючи літаки. Починайте з України та розширюйте свою мережу!</p>
+        <button id="startGameBtn">Почати гру</button>
     </div>
 
-    <!-- Модальное окно для ввода количества солдат -->
-    <div class="modal" id="soldierModal">
-        <div class="modal-content">
-            <h3 id="modalTitle">Отправка подкреплений</h3>
-            <p>Введите количество солдат для отправки:</p>
-            <input type="number" id="soldierInput" min="1000" value="5000">
-            <div class="modal-buttons">
-                <button class="modal-btn confirm-btn" id="confirmDeploy">Отправить</button>
-                <button class="modal-btn cancel-btn" id="cancelDeploy">Отмена</button>
+    <!-- Ігровий екран -->
+    <div id="gameScreen" class="screen hidden">
+        <!-- Карта -->
+        <div id="map"></div>
+
+        <!-- Панель управління -->
+        <div id="controlPanel">
+            <h3>Панель управління</h3>
+            <div id="cityInfo" class="info-section hidden">
+                <h4 id="cityName">Назва міста</h4>
+                <p>Населення: <span id="cityPopulation">0</span></p>
+                <p>Країна: <span id="cityCountry">-</span></p>
+                <button id="buildAirportBtn">Побудувати аеропорт ($1,000,000)</button>
+            </div>
+            
+            <div id="airportInfo" class="info-section hidden">
+                <h4>Аеропорт</h4>
+                <p>Статус: <span id="airportStatus">Активний</span></p>
+                <div id="airportPlanes">
+                    <h5>Літаки:</h5>
+                    <div id="planesList"></div>
+                </div>
+                <div id="buyPlaneSection">
+                    <h5>Купити літак:</h5>
+                    <button class="buy-plane control-btn" data-plane="f16">F-16 ($1,700,000)</button>
+                    <button class="buy-plane control-btn" data-plane="mig29">МіГ-29 ($1,500,000)</button>
+                    <button class="buy-plane control-btn" data-plane="su27">Су-27 ($1,800,000)</button>
+                </div>
+            </div>
+            
+            <div id="planeInfo" class="info-section hidden">
+                <h4 id="planeName">Літак</h4>
+                <p>Тип: <span id="planeType">-</span></p>
+                <p>Швидкість: <span id="planeSpeed">-</span></p>
+                <p>Базується в: <span id="planeBase">-</span></p>
+                <button id="directPlaneBtn" class="control-btn">Направити літак</button>
+                <button id="stopDirectBtn" class="control-btn hidden">Зупинити направлення</button>
+            </div>
+            
+            <div class="info-section">
+                <h4>Доходи</h4>
+                <p>+$70,000 кожні 3 секунди</p>
+                <p>Наступний дохід через: <span id="incomeTimer">3с</span></p>
             </div>
         </div>
     </div>
 
+    <!-- Сповіщення -->
+    <div id="notification" class="notification"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Элементы DOM
-        const menu = document.getElementById('menu');
+        // Дані гри
+        const gameData = {
+            money: 250000,
+            income: 70000,
+            incomeInterval: 3000, // 3 секунди
+            cities: [
+                { id: 1, name: "Київ", country: "ua", population: 2884000, lat: 50.4501, lng: 30.5234 },
+                { id: 2, name: "Харків", country: "ua", population: 1441000, lat: 49.9935, lng: 36.2304 },
+                { id: 3, name: "Одеса", country: "ua", population: 1017000, lat: 46.4825, lng: 30.7233 },
+                { id: 4, name: "Львів", country: "ua", population: 724000, lat: 49.8397, lng: 24.0297 },
+                { id: 5, name: "Дніпро", country: "ua", population: 966000, lat: 48.4647, lng: 35.0462 },
+                { id: 6, name: "Москва", country: "ru", population: 12655000, lat: 55.7558, lng: 37.6173 },
+                { id: 7, name: "Санкт-Петербург", country: "ru", population: 5398000, lat: 59.9343, lng: 30.3351 },
+                { id: 8, name: "Новосибірськ", country: "ru", population: 1620000, lat: 55.0084, lng: 82.9357 },
+                { id: 9, name: "Єкатеринбург", country: "ru", population: 1495000, lat: 56.8389, lng: 60.6057 },
+                { id: 10, name: "Казань", country: "ru", population: 1257000, lat: 55.7964, lng: 49.1089 }
+            ],
+            planes: {
+                f16: { name: "F-16 Fighting Falcon", price: 1700000, speed: "Макс. 2,170 км/год" },
+                mig29: { name: "МіГ-29 Fulcrum", price: 1500000, speed: "Макс. 2,400 км/год" },
+                su27: { name: "Су-27 Flanker", price: 1800000, speed: "Макс. 2,500 км/год" }
+            },
+            airports: [],
+            playerPlanes: [],
+            selectedCity: null,
+            selectedPlane: null,
+            isDirecting: false
+        };
+
+        // Елементи DOM
+        const startScreen = document.getElementById('startScreen');
         const gameScreen = document.getElementById('gameScreen');
-        const battleScreen = document.getElementById('battleScreen');
-        const playBtn = document.getElementById('playBtn');
-        const backToMenu = document.getElementById('backToMenu');
-        const backToDifficulty = document.getElementById('backToDifficulty');
-        const difficultyButtons = document.querySelectorAll('.difficulty-buttons button');
-        const blueSoldiersElement = document.getElementById('blueSoldiers');
-        const redSoldiersElement = document.getElementById('redSoldiers');
-        const countdownElement = document.getElementById('countdown');
-        const recruitBtn = document.getElementById('recruitBtn');
-        const cooldownElement = document.getElementById('cooldown');
-        const blueTerritory = document.getElementById('blueTerritory');
-        const redTerritory = document.getElementById('redTerritory');
-        const blueLabel = document.getElementById('blueLabel');
-        const redLabel = document.getElementById('redLabel');
-        const frontLine = document.getElementById('frontLine');
-        const battleLog = document.getElementById('battleLog');
-        const deployLeft = document.getElementById('deployLeft');
-        const deployCenter = document.getElementById('deployCenter');
-        const deployRight = document.getElementById('deployRight');
-        const battlefield = document.getElementById('battlefield');
-        const arrowLeft = document.getElementById('arrowLeft');
-        const arrowCenter = document.getElementById('arrowCenter');
-        const arrowRight = document.getElementById('arrowRight');
-        const soldierModal = document.getElementById('soldierModal');
-        const soldierInput = document.getElementById('soldierInput');
-        const confirmDeploy = document.getElementById('confirmDeploy');
-        const cancelDeploy = document.getElementById('cancelDeploy');
-        const modalTitle = document.getElementById('modalTitle');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const playButton = document.getElementById('playButton');
+        const moneyDisplay = document.getElementById('moneyDisplay');
+        const cityInfo = document.getElementById('cityInfo');
+        const cityName = document.getElementById('cityName');
+        const cityPopulation = document.getElementById('cityPopulation');
+        const cityCountry = document.getElementById('cityCountry');
+        const buildAirportBtn = document.getElementById('buildAirportBtn');
+        const airportInfo = document.getElementById('airportInfo');
+        const planesList = document.getElementById('planesList');
+        const buyPlaneSection = document.getElementById('buyPlaneSection');
+        const planeInfo = document.getElementById('planeInfo');
+        const planeName = document.getElementById('planeName');
+        const planeType = document.getElementById('planeType');
+        const planeSpeed = document.getElementById('planeSpeed');
+        const planeBase = document.getElementById('planeBase');
+        const directPlaneBtn = document.getElementById('directPlaneBtn');
+        const stopDirectBtn = document.getElementById('stopDirectBtn');
+        const incomeTimer = document.getElementById('incomeTimer');
+        const notification = document.getElementById('notification');
 
-        // Игровые переменные
-        let gameState = {
-            difficulty: 'easy',
-            blueSoldiers: 0,
-            redSoldiers: 0,
-            blueDeployment: { left: 0, center: 0, right: 0 },
-            redDeployment: { left: 0, center: 0, right: 0 },
-            countdown: 30,
-            battleStarted: false,
-            recruitCooldown: 0,
-            territory: 50, // процент территории синих
-            selectedSector: null
-        };
+        // Карта Leaflet
+        let map;
+        let cityMarkers = [];
+        let airportMarkers = [];
+        let planeMarkers = [];
+        let planePaths = [];
 
-        // Настройки сложности
-        const difficultySettings = {
-            easy: { redSoldiers: 100000 },
-            medium: { redSoldiers: 300000 },
-            hard: { redSoldiers: 600000 },
-            insane: { redSoldiers: 1000000 }
-        };
-
-        // Навигация
-        playBtn.addEventListener('click', () => {
-            menu.classList.add('hidden');
+        // Ініціалізація гри
+        function initGame() {
+            // Ініціалізація карти
+            initMap();
+            
+            // Додавання міст на карту
+            addCitiesToMap();
+            
+            // Оновлення відображення грошей
+            updateMoneyDisplay();
+            
+            // Запуск доходу
+            startIncome();
+            
+            // Сховати стартовий екран, показати ігровий
+            startScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-        });
+            
+            showNotification("Гра розпочалася! Ви починаєте в Україні.");
+        }
 
-        backToMenu.addEventListener('click', () => {
-            gameScreen.classList.add('hidden');
-            menu.classList.remove('hidden');
-        });
-
-        backToDifficulty.addEventListener('click', () => {
-            battleScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            resetGame();
-        });
-
-        // Выбор сложности
-        difficultyButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                gameState.difficulty = button.dataset.difficulty;
-                startGame();
+        // Ініціалізація карти
+        function initMap() {
+            // Створення карти з чорним фоном
+            map = L.map('map', {
+                center: [50.4501, 30.5234], // Київ
+                zoom: 6,
+                minZoom: 4,
+                maxZoom: 10,
+                zoomControl: false
             });
-        });
-
-        // Начать игру
-        function startGame() {
-            gameScreen.classList.add('hidden');
-            battleScreen.classList.remove('hidden');
             
-            // Инициализация игры
-            const settings = difficultySettings[gameState.difficulty];
-            gameState.redSoldiers = settings.redSoldiers;
-            gameState.blueSoldiers = 0;
-            gameState.countdown = 30;
-            gameState.battleStarted = false;
-            gameState.recruitCooldown = 0;
-            gameState.territory = 50;
+            // Додаємо контрол зумірования
+            L.control.zoom({
+                position: 'topright'
+            }).addTo(map);
             
-            updateUI();
-            startCountdown();
+            // Додаємо можливість переміщення карти правою кнопкою миші
+            map.dragging.disable();
+            map.on('mousedown', function(e) {
+                if (e.originalEvent.button === 2) { // Права кнопка миші
+                    map.dragging.enable();
+                    setTimeout(() => map.dragging.disable(), 1000);
+                }
+            });
             
-            // Очистить лог битвы
-            battleLog.innerHTML = '<div class="yellow-text">Операция начнется через 30 секунд. Мобилизуйте войска!</div>';
-            
-            // Добавить сообщение о сложности
-            addLogMessage(`Активирована операция уровня "${getDifficultyName(gameState.difficulty)}". Противник имеет ${gameState.redSoldiers.toLocaleString()} солдат.`, 'yellow-text');
+            // Для мобільних пристроїв
+            map.on('touchstart', function() {
+                map.dragging.enable();
+                setTimeout(() => map.dragging.disable(), 1000);
+            });
         }
 
-        // Получить название сложности
-        function getDifficultyName(difficulty) {
-            const names = {
-                'easy': 'ЛЕГКИЙ',
-                'medium': 'СРЕДНИЙ',
-                'hard': 'СЛОЖНЫЙ',
-                'insane': 'ХАРД'
-            };
-            return names[difficulty];
+        // Додавання міст на карту
+        function addCitiesToMap() {
+            gameData.cities.forEach(city => {
+                // Створення маркера міста
+                const marker = L.circleMarker([city.lat, city.lng], {
+                    radius: 6,
+                    fillColor: 'white',
+                    color: 'white',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+                
+                // Додавання спливаючої підказки
+                marker.bindTooltip(city.name, {
+                    permanent: false,
+                    direction: 'top',
+                    offset: [0, -10]
+                });
+                
+                // Обробник кліку на місті
+                marker.on('click', () => {
+                    selectCity(city);
+                });
+                
+                cityMarkers.push(marker);
+            });
         }
 
-        // Сброс игры
-        function resetGame() {
-            gameState = {
-                difficulty: 'easy',
-                blueSoldiers: 0,
-                redSoldiers: 0,
-                blueDeployment: { left: 0, center: 0, right: 0 },
-                redDeployment: { left: 0, center: 0, right: 0 },
-                countdown: 30,
-                battleStarted: false,
-                recruitCooldown: 0,
-                territory: 50,
-                selectedSector: null
-            };
-        }
-
-        // Обновление интерфейса
-        function updateUI() {
-            blueSoldiersElement.textContent = gameState.blueSoldiers.toLocaleString();
-            redSoldiersElement.textContent = gameState.redSoldiers.toLocaleString();
+        // Вибір міста
+        function selectCity(city) {
+            gameData.selectedCity = city;
             
-            blueLabel.textContent = gameState.blueSoldiers.toLocaleString();
-            redLabel.textContent = gameState.redSoldiers.toLocaleString();
+            // Оновлення інформації про місто
+            cityName.textContent = city.name;
+            cityPopulation.textContent = city.population.toLocaleString();
+            cityCountry.textContent = city.country === 'ua' ? 'Україна' : 'Росія';
             
-            // Обновление территории
-            blueTerritory.style.width = `${gameState.territory}%`;
-            redTerritory.style.width = `${100 - gameState.territory}%`;
+            // Перевірка, чи є в місті аеропорт
+            const hasAirport = gameData.airports.some(airport => airport.cityId === city.id);
             
-            // Обновление линии фронта с изгибом
-            updateFrontLine();
-            
-            // Обновление кнопки найма
-            if (gameState.recruitCooldown > 0) {
-                recruitBtn.disabled = true;
-                cooldownElement.textContent = gameState.recruitCooldown;
+            if (hasAirport) {
+                // Показати інформацію про аеропорт
+                cityInfo.classList.add('hidden');
+                showAirportInfo(city.id);
             } else {
-                recruitBtn.disabled = false;
-                cooldownElement.textContent = '0';
+                // Показати кнопку для будівництва аеропорту
+                airportInfo.classList.add('hidden');
+                cityInfo.classList.remove('hidden');
+                
+                // Активувати/деактивувати кнопку будівництва в залежності від грошей
+                buildAirportBtn.disabled = gameData.money < 1000000;
             }
             
-            // Обновление развертывания
-            deployLeft.textContent = gameState.blueDeployment.left.toLocaleString();
-            deployCenter.textContent = gameState.blueDeployment.center.toLocaleString();
-            deployRight.textContent = gameState.blueDeployment.right.toLocaleString();
+            // Сховати інформацію про літак
+            planeInfo.classList.add('hidden');
         }
 
-        // Обновление линии фронта с изгибом
-        function updateFrontLine() {
-            // Создаем изгиб линии фронта на основе распределения сил
-            const leftBalance = gameState.blueDeployment.left - gameState.redDeployment.left;
-            const centerBalance = gameState.blueDeployment.center - gameState.redDeployment.center;
-            const rightBalance = gameState.blueDeployment.right - gameState.redDeployment.right;
+        // Показати інформацію про аеропорт
+        function showAirportInfo(cityId) {
+            const airport = gameData.airports.find(a => a.cityId === cityId);
+            if (!airport) return;
             
-            // Рассчитываем общий изгиб
-            let curve = 0;
-            if (Math.abs(leftBalance) > 1000) curve -= leftBalance / 50000;
-            if (Math.abs(rightBalance) > 1000) curve += rightBalance / 50000;
+            // Оновити список літаків
+            updatePlanesList(cityId);
             
-            // Ограничиваем изгиб
-            curve = Math.max(-30, Math.min(30, curve));
+            // Активувати/деактивувати кнопки купівлі літаків
+            document.querySelectorAll('.buy-plane').forEach(btn => {
+                const planeType = btn.dataset.plane;
+                btn.disabled = gameData.money < gameData.planes[planeType].price;
+            });
             
-            // Применяем изгиб к линии фронта
-            frontLine.style.left = `${gameState.territory}%`;
-            frontLine.style.transform = `translateX(-50%) skewX(${curve}deg)`;
+            // Показати панель аеропорту
+            airportInfo.classList.remove('hidden');
         }
 
-        // Обратный отсчет до битвы
-        function startCountdown() {
-            const countdownInterval = setInterval(() => {
-                gameState.countdown--;
-                countdownElement.textContent = `До начала битвы: ${gameState.countdown}`;
+        // Оновити список літаків
+        function updatePlanesList(cityId) {
+            planesList.innerHTML = '';
+            
+            const planesInCity = gameData.playerPlanes.filter(plane => plane.baseCityId === cityId);
+            
+            if (planesInCity.length === 0) {
+                planesList.innerHTML = '<p>Немає літаків</p>';
+                return;
+            }
+            
+            planesInCity.forEach(plane => {
+                const planeItem = document.createElement('div');
+                planeItem.className = 'plane-item';
                 
-                if (gameState.countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    startBattle();
+                planeItem.innerHTML = `
+                    <div class="plane-info">
+                        <span class="plane-name">${plane.name}</span>
+                        <span class="plane-stats">${plane.speed}</span>
+                    </div>
+                    <button class="select-plane" data-plane-id="${plane.id}">Вибрати</button>
+                `;
+                
+                planesList.appendChild(planeItem);
+            });
+            
+            // Додати обробники подій для кнопок вибору літака
+            document.querySelectorAll('.select-plane').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const planeId = parseInt(btn.dataset.planeId);
+                    selectPlane(planeId);
+                });
+            });
+        }
+
+        // Вибір літака
+        function selectPlane(planeId) {
+            const plane = gameData.playerPlanes.find(p => p.id === planeId);
+            if (!plane) return;
+            
+            gameData.selectedPlane = plane;
+            
+            // Оновити інформацію про літак
+            planeName.textContent = plane.name;
+            planeType.textContent = plane.type;
+            planeSpeed.textContent = plane.speed;
+            
+            const baseCity = gameData.cities.find(c => c.id === plane.baseCityId);
+            planeBase.textContent = baseCity ? baseCity.name : 'Невідомо';
+            
+            // Показати панель літака
+            planeInfo.classList.remove('hidden');
+            
+            // Сховати панель аеропорту
+            airportInfo.classList.add('hidden');
+        }
+
+        // Побудова аеропорту
+        function buildAirport() {
+            if (!gameData.selectedCity) return;
+            
+            if (gameData.money < 1000000) {
+                showNotification("Недостатньо коштів для будівництва аеропорту!");
+                return;
+            }
+            
+            // Перевірка, чи вже є аеропорт у цьому місті
+            if (gameData.airports.some(airport => airport.cityId === gameData.selectedCity.id)) {
+                showNotification("Аеропорт вже побудований у цьому місті!");
+                return;
+            }
+            
+            // Відняти гроші
+            gameData.money -= 1000000;
+            updateMoneyDisplay();
+            
+            // Додати аеропорт
+            const airport = {
+                id: gameData.airports.length + 1,
+                cityId: gameData.selectedCity.id
+            };
+            
+            gameData.airports.push(airport);
+            
+            // Додати маркер аеропорту на карту
+            addAirportMarker(gameData.selectedCity);
+            
+            // Оновити інтерфейс
+            cityInfo.classList.add('hidden');
+            showAirportInfo(gameData.selectedCity.id);
+            
+            showNotification(`Аеропорт побудовано в місті ${gameData.selectedCity.name}!`);
+        }
+
+        // Додати маркер аеропорту на карту
+        function addAirportMarker(city) {
+            const marker = L.circleMarker([city.lat, city.lng], {
+                radius: 8,
+                fillColor: '#4CAF50',
+                color: '#4CAF50',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+            
+            marker.bindTooltip(`Аеропорт ${city.name}`, {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -10]
+            });
+            
+            airportMarkers.push(marker);
+        }
+
+        // Купівля літака
+        function buyPlane(planeType) {
+            if (!gameData.selectedCity) return;
+            
+            const planeData = gameData.planes[planeType];
+            if (!planeData) return;
+            
+            if (gameData.money < planeData.price) {
+                showNotification(`Недостатньо коштів для покупки ${planeData.name}!`);
+                return;
+            }
+            
+            // Перевірка, чи є аеропорт у місті
+            if (!gameData.airports.some(airport => airport.cityId === gameData.selectedCity.id)) {
+                showNotification("Спочатку побудуйте аеропорт у цьому місті!");
+                return;
+            }
+            
+            // Відняти гроші
+            gameData.money -= planeData.price;
+            updateMoneyDisplay();
+            
+            // Додати літак
+            const plane = {
+                id: gameData.playerPlanes.length + 1,
+                name: planeData.name,
+                type: planeType,
+                speed: planeData.speed,
+                baseCityId: gameData.selectedCity.id,
+                lat: gameData.selectedCity.lat,
+                lng: gameData.selectedCity.lng
+            };
+            
+            gameData.playerPlanes.push(plane);
+            
+            // Додати маркер літака на карту
+            addPlaneMarker(plane);
+            
+            // Оновити список літаків
+            updatePlanesList(gameData.selectedCity.id);
+            
+            showNotification(`Літак ${planeData.name} куплено!`);
+        }
+
+        // Додати маркер літака на карту
+        function addPlaneMarker(plane) {
+            const icon = L.divIcon({
+                className: 'plane-marker',
+                html: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            
+            const marker = L.marker([plane.lat, plane.lng], { icon: icon }).addTo(map);
+            
+            marker.bindTooltip(plane.name, {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -15]
+            });
+            
+            marker.on('click', () => {
+                selectPlane(plane.id);
+            });
+            
+            planeMarkers.push(marker);
+        }
+
+        // Направлення літака
+        function directPlane() {
+            if (!gameData.selectedPlane) return;
+            
+            gameData.isDirecting = true;
+            directPlaneBtn.classList.add('hidden');
+            stopDirectBtn.classList.remove('hidden');
+            
+            // Додати обробник кліку по карті
+            map.on('click', onMapClickForDirection);
+            
+            showNotification("Натисніть на карту, щоб задати маршрут літаку");
+        }
+
+        // Зупинити направлення літака
+        function stopDirecting() {
+            gameData.isDirecting = false;
+            directPlaneBtn.classList.remove('hidden');
+            stopDirectBtn.classList.add('hidden');
+            
+            // Видалити обробник кліку по карті
+            map.off('click', onMapClickForDirection);
+            
+            // Видалити лінію маршруту, якщо вона є
+            if (planePaths.length > 0) {
+                planePaths.forEach(path => map.removeLayer(path));
+                planePaths = [];
+            }
+        }
+
+        // Обробник кліку по карті для направлення літака
+        function onMapClickForDirection(e) {
+            if (!gameData.selectedPlane || !gameData.isDirecting) return;
+            
+            const targetLat = e.latlng.lat;
+            const targetLng = e.latlng.lng;
+            
+            // Оновити позицію літака
+            const plane = gameData.playerPlanes.find(p => p.id === gameData.selectedPlane.id);
+            if (plane) {
+                plane.lat = targetLat;
+                plane.lng = targetLng;
+                
+                // Оновити маркер літака на карті
+                const planeMarker = planeMarkers.find(m => {
+                    const markerLat = m.getLatLng().lat;
+                    const markerLng = m.getLatLng().lng;
+                    return markerLat === plane.lat && markerLng === plane.lng;
+                });
+                
+                if (planeMarker) {
+                    planeMarker.setLatLng([targetLat, targetLng]);
+                }
+                
+                // Додати лінію маршруту
+                const baseCity = gameData.cities.find(c => c.id === plane.baseCityId);
+                if (baseCity) {
+                    const path = L.polyline([
+                        [baseCity.lat, baseCity.lng],
+                        [targetLat, targetLng]
+                    ], {
+                        color: '#ff8a00',
+                        weight: 2,
+                        dashArray: '5, 5'
+                    }).addTo(map);
+                    
+                    planePaths.push(path);
+                }
+                
+                showNotification(`Літак направлено до координат: ${targetLat.toFixed(4)}, ${targetLng.toFixed(4)}`);
+            }
+            
+            // Зупинити направлення після вибору точки
+            stopDirecting();
+        }
+
+        // Оновлення відображення грошей
+        function updateMoneyDisplay() {
+            moneyDisplay.textContent = `Гроші: $${gameData.money.toLocaleString()}`;
+        }
+
+        // Запуск доходу
+        function startIncome() {
+            let timeLeft = gameData.incomeInterval / 1000;
+            
+            const incomeInterval = setInterval(() => {
+                timeLeft--;
+                incomeTimer.textContent = `${timeLeft}с`;
+                
+                if (timeLeft <= 0) {
+                    gameData.money += gameData.income;
+                    updateMoneyDisplay();
+                    timeLeft = gameData.incomeInterval / 1000;
+                    showNotification(`Отримано дохід: $${gameData.income.toLocaleString()}`);
                 }
             }, 1000);
         }
 
-        // Начать битву
-        function startBattle() {
-            gameState.battleStarted = true;
-            countdownElement.textContent = 'ОПЕРАЦИЯ НАЧАЛАСЬ!';
-            addLogMessage('=== ОПЕРАЦИЯ X АКТИВИРОВАНА! ===', 'yellow-text');
+        // Показати сповіщення
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
             
-            // Показать стрелки управления
-            arrowLeft.style.display = 'block';
-            arrowCenter.style.display = 'block';
-            arrowRight.style.display = 'block';
-            
-            // Запустить логику ИИ
-            setInterval(aiLogic, 2000);
-            
-            // Запустить симуляцию битвы
-            setInterval(simulateBattle, 1000);
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        // Логика ИИ
-        function aiLogic() {
-            if (!gameState.battleStarted) return;
-            
-            // ИИ распределяет солдат случайным образом
-            const totalRed = gameState.redSoldiers;
-            const left = Math.floor(totalRed * (0.2 + Math.random() * 0.3));
-            const center = Math.floor(totalRed * (0.3 + Math.random() * 0.3));
-            const right = totalRed - left - center;
-            
-            gameState.redDeployment = { left, center, right };
-            
-            addLogMessage(`Противник перегруппировал силы: Левый фланг ${left.toLocaleString()}, Центр ${center.toLocaleString()}, Правый фланг ${right.toLocaleString()}`, 'red-text');
-            
-            updateUI();
-        }
-
-        // Симуляция битвы
-        function simulateBattle() {
-            if (!gameState.battleStarted) return;
-            
-            // Расчет сил на каждом участке
-            const blueForces = gameState.blueDeployment;
-            const redForces = gameState.redDeployment;
-            
-            // Общая эффективность
-            let blueEffectiveness = 0;
-            let redEffectiveness = 0;
-            
-            // Расчет эффективности на каждом участке
-            const sectors = ['left', 'center', 'right'];
-            let sectorMessages = [];
-            
-            sectors.forEach(sector => {
-                const blue = blueForces[sector] || 0;
-                const red = redForces[sector] || 0;
-                
-                if (blue > red * 1.5) {
-                    // Синие окружают красных на этом участке
-                    blueEffectiveness += 2;
-                    sectorMessages.push(`Синие окружают противника на ${getSectorName(sector)}!`);
-                } else if (red > blue * 1.5) {
-                    // Красные окружают синих на этом участке
-                    redEffectiveness += 2;
-                    sectorMessages.push(`Красные окружают ваши силы на ${getSectorName(sector)}!`);
-                } else if (blue > red) {
-                    blueEffectiveness += 1;
-                } else if (red > blue) {
-                    redEffectiveness += 1;
-                }
-                
-                // Потери в бою
-                const blueLosses = Math.min(blue, Math.floor(red * 0.1));
-                const redLosses = Math.min(red, Math.floor(blue * 0.1));
-                
-                gameState.blueDeployment[sector] -= blueLosses;
-                gameState.redDeployment[sector] -= redLosses;
-                gameState.blueSoldiers = Math.max(0, gameState.blueSoldiers - blueLosses);
-                gameState.redSoldiers = Math.max(0, gameState.redSoldiers - redLosses);
+        // Обробники подій
+        startGameBtn.addEventListener('click', initGame);
+        playButton.addEventListener('click', initGame);
+        
+        buildAirportBtn.addEventListener('click', buildAirport);
+        
+        document.querySelectorAll('.buy-plane').forEach(btn => {
+            btn.addEventListener('click', () => {
+                buyPlane(btn.dataset.plane);
             });
-            
-            // Изменение территории на основе эффективности и разницы в силах
-            const totalBlue = gameState.blueSoldiers + gameState.blueDeployment.left + gameState.blueDeployment.center + gameState.blueDeployment.right;
-            const totalRed = gameState.redSoldiers + gameState.redDeployment.left + gameState.redDeployment.center + gameState.redDeployment.right;
-            
-            // Рассчитываем скорость продвижения фронта в зависимости от разницы в силах
-            const forceDifference = totalBlue - totalRed;
-            const advanceSpeed = Math.max(0.1, Math.min(2, 1 + forceDifference / 100000));
-            
-            if (blueEffectiveness > redEffectiveness) {
-                gameState.territory += advanceSpeed;
-                addLogMessage(`Ваши войска продвигаются вперед! (скорость: ${advanceSpeed.toFixed(1)}x)`, 'blue-text');
-            } else if (redEffectiveness > blueEffectiveness) {
-                gameState.territory -= advanceSpeed;
-                addLogMessage(`Противник продвигается вперед! (скорость: ${advanceSpeed.toFixed(1)}x)`, 'red-text');
-            }
-            
-            // Добавить сообщения о секторах
-            if (sectorMessages.length > 0) {
-                sectorMessages.forEach(msg => addLogMessage(msg, 'yellow-text'));
-            }
-            
-            // Ограничение территории от 5% до 95%
-            gameState.territory = Math.max(5, Math.min(95, gameState.territory));
-            
-            // Обновление интерфейса
-            updateUI();
-            
-            // Проверка условий победы/поражения
-            if (gameState.territory >= 90) {
-                endGame('blue');
-            } else if (gameState.territory <= 10) {
-                endGame('red');
-            }
-        }
-
-        // Получить название участка
-        function getSectorName(sector) {
-            const names = {
-                'left': 'левом фланге',
-                'center': 'центре',
-                'right': 'правом фланге'
-            };
-            return names[sector];
-        }
-
-        // Завершение игры
-        function endGame(winner) {
-            gameState.battleStarted = false;
-            
-            // Скрыть стрелки
-            arrowLeft.style.display = 'none';
-            arrowCenter.style.display = 'none';
-            arrowRight.style.display = 'none';
-            
-            if (winner === 'blue') {
-                addLogMessage('=== ПОБЕДА! ОПЕРАЦИЯ УСПЕШНО ЗАВЕРШЕНА! ===', 'blue-text');
-                addLogMessage('Вы захватили 90% территории противника!', 'blue-text');
-                setTimeout(() => alert('ПОБЕДА! ОПЕРАЦИЯ УСПЕШНО ЗАВЕРШЕНА! Вы захватили 90% территории противника!'), 100);
-            } else {
-                addLogMessage('=== ПОРАЖЕНИЕ! ОПЕРАЦИЯ ПРОВАЛЕНА! ===', 'red-text');
-                addLogMessage('Вы потеряли 90% своей территории!', 'red-text');
-                setTimeout(() => alert('ПОРАЖЕНИЕ! ОПЕРАЦИЯ ПРОВАЛЕНА! Вы потеряли 90% своей территории!'), 100);
-            }
-        }
-
-        // Наем солдат
-        recruitBtn.addEventListener('click', () => {
-            if (gameState.recruitCooldown > 0) return;
-            
-            gameState.blueSoldiers += 15000;
-            gameState.recruitCooldown = 5;
-            updateUI();
-            addLogMessage('Мобилизовано 15,000 солдат!', 'blue-text');
-            
-            // Запустить перезарядку
-            const cooldownInterval = setInterval(() => {
-                gameState.recruitCooldown--;
-                updateUI();
-                
-                if (gameState.recruitCooldown <= 0) {
-                    clearInterval(cooldownInterval);
-                }
-            }, 1000);
         });
+        
+        directPlaneBtn.addEventListener('click', directPlane);
+        stopDirectBtn.addEventListener('click', stopDirecting);
 
-        // Обработчики для стрелок
-        arrowLeft.addEventListener('click', () => {
-            if (!gameState.battleStarted) return;
-            gameState.selectedSector = 'left';
-            showSoldierModal('левый фланг');
-        });
-
-        arrowCenter.addEventListener('click', () => {
-            if (!gameState.battleStarted) return;
-            gameState.selectedSector = 'center';
-            showSoldierModal('центр');
-        });
-
-        arrowRight.addEventListener('click', () => {
-            if (!gameState.battleStarted) return;
-            gameState.selectedSector = 'right';
-            showSoldierModal('правый фланг');
-        });
-
-        // Показать модальное окно для ввода солдат
-        function showSoldierModal(sectorName) {
-            modalTitle.textContent = `Отправка подкреплений на ${sectorName}`;
-            soldierInput.value = Math.min(10000, gameState.blueSoldiers);
-            soldierInput.max = gameState.blueSoldiers;
-            soldierModal.style.display = 'flex';
-        }
-
-        // Подтверждение отправки солдат
-        confirmDeploy.addEventListener('click', () => {
-            const soldierCount = parseInt(soldierInput.value);
-            
-            if (isNaN(soldierCount) || soldierCount < 1000) {
-                alert('Минимальное количество солдат для отправки - 1000!');
-                return;
-            }
-            
-            if (soldierCount > gameState.blueSoldiers) {
-                alert('Недостаточно солдат для отправки!');
-                return;
-            }
-            
-            // Отправляем солдат на выбранный участок
-            gameState.blueDeployment[gameState.selectedSector] += soldierCount;
-            gameState.blueSoldiers -= soldierCount;
-            
-            addLogMessage(`Отправлено ${soldierCount.toLocaleString()} солдат на ${getSectorName(gameState.selectedSector)}.`, 'blue-text');
-            
-            updateUI();
-            soldierModal.style.display = 'none';
-        });
-
-        // Отмена отправки солдат
-        cancelDeploy.addEventListener('click', () => {
-            soldierModal.style.display = 'none';
-        });
-
-        // Добавить сообщение в лог
-        function addLogMessage(message, cssClass = '') {
-            const logEntry = document.createElement('div');
-            logEntry.innerHTML = message;
-            if (cssClass) logEntry.className = cssClass;
-            battleLog.appendChild(logEntry);
-            battleLog.scrollTop = battleLog.scrollHeight;
-        }
+        // Початкова ініціалізація
+        updateMoneyDisplay();
     </script>
 </body>
 </html>
