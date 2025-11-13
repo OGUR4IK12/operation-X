@@ -196,14 +196,12 @@
             left: 0;
             background: rgba(0, 120, 255, 0.15);
             width: 50%;
-            border-right: 2px dashed rgba(0, 120, 255, 0.5);
         }
 
         .red-territory {
             right: 0;
             background: rgba(255, 0, 0, 0.15);
             width: 50%;
-            border-left: 2px dashed rgba(255, 0, 0, 0.5);
         }
 
         .front-line {
@@ -214,7 +212,7 @@
             background: linear-gradient(to bottom, #fdbb2d, #ff5e00);
             left: 50%;
             transform: translateX(-50%);
-            transition: all 2s ease;
+            transition: all 3s ease;
             box-shadow: 0 0 15px #fdbb2d;
             z-index: 10;
         }
@@ -358,6 +356,110 @@
             margin-bottom: 8px;
         }
 
+        /* Стили для стрелок */
+        .arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+
+        .arrow:hover {
+            transform: scale(1.2);
+        }
+
+        .arrow-left {
+            left: 20%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 15px 30px 15px 0;
+            border-color: transparent #00a8ff transparent transparent;
+        }
+
+        .arrow-center {
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-width: 30px 0 30px 50px;
+            border-color: transparent transparent transparent #00a8ff;
+        }
+
+        .arrow-right {
+            right: 20%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 15px 0 15px 30px;
+            border-color: transparent transparent transparent #00a8ff;
+        }
+
+        /* Модальное окно для ввода солдат */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a4a, #2d0c2d);
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            border: 2px solid #8e2de2;
+            box-shadow: 0 0 30px rgba(142, 45, 226, 0.7);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #fdbb2d;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #8e2de2;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -400,7 +502,8 @@
                 <ul>
                     <li>Выберите уровень сложности</li>
                     <li>Накопите солдат перед битвой (кнопка найма)</li>
-                    <li>Распределите войска по фронту</li>
+                    <li>Нажмите на стрелки для отправки войск на фронт</li>
+                    <li>Введите количество солдат для отправки</li>
                     <li>Используйте тактические преимущества для окружения противника</li>
                     <li>Захватите 90% территории для победы!</li>
                 </ul>
@@ -447,6 +550,11 @@
                     <div class="territory red-territory" id="redTerritory">
                         <div class="territory-label red-label" id="redLabel">100,000</div>
                     </div>
+                    
+                    <!-- Стрелки для управления войсками -->
+                    <div class="arrow arrow-left" id="arrowLeft"></div>
+                    <div class="arrow arrow-center" id="arrowCenter"></div>
+                    <div class="arrow arrow-right" id="arrowRight"></div>
                 </div>
             </div>
 
@@ -480,6 +588,19 @@
         </div>
     </div>
 
+    <!-- Модальное окно для ввода количества солдат -->
+    <div class="modal" id="soldierModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Отправка подкреплений</h3>
+            <p>Введите количество солдат для отправки:</p>
+            <input type="number" id="soldierInput" min="1000" value="5000">
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" id="confirmDeploy">Отправить</button>
+                <button class="modal-btn cancel-btn" id="cancelDeploy">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Элементы DOM
         const menu = document.getElementById('menu');
@@ -504,6 +625,14 @@
         const deployCenter = document.getElementById('deployCenter');
         const deployRight = document.getElementById('deployRight');
         const battlefield = document.getElementById('battlefield');
+        const arrowLeft = document.getElementById('arrowLeft');
+        const arrowCenter = document.getElementById('arrowCenter');
+        const arrowRight = document.getElementById('arrowRight');
+        const soldierModal = document.getElementById('soldierModal');
+        const soldierInput = document.getElementById('soldierInput');
+        const confirmDeploy = document.getElementById('confirmDeploy');
+        const cancelDeploy = document.getElementById('cancelDeploy');
+        const modalTitle = document.getElementById('modalTitle');
 
         // Игровые переменные
         let gameState = {
@@ -516,7 +645,7 @@
             battleStarted: false,
             recruitCooldown: 0,
             territory: 50, // процент территории синих
-            frontLineCurve: 0 // изгиб линии фронта (-50 до +50)
+            selectedSector: null
         };
 
         // Настройки сложности
@@ -565,7 +694,6 @@
             gameState.battleStarted = false;
             gameState.recruitCooldown = 0;
             gameState.territory = 50;
-            gameState.frontLineCurve = 0;
             
             updateUI();
             startCountdown();
@@ -600,7 +728,7 @@
                 battleStarted: false,
                 recruitCooldown: 0,
                 territory: 50,
-                frontLineCurve: 0
+                selectedSector: null
             };
         }
 
@@ -647,11 +775,11 @@
             if (Math.abs(rightBalance) > 1000) curve += rightBalance / 50000;
             
             // Ограничиваем изгиб
-            gameState.frontLineCurve = Math.max(-30, Math.min(30, curve));
+            curve = Math.max(-30, Math.min(30, curve));
             
             // Применяем изгиб к линии фронта
             frontLine.style.left = `${gameState.territory}%`;
-            frontLine.style.transform = `translateX(-50%) skewX(${gameState.frontLineCurve}deg)`;
+            frontLine.style.transform = `translateX(-50%) skewX(${curve}deg)`;
         }
 
         // Обратный отсчет до битвы
@@ -672,6 +800,11 @@
             gameState.battleStarted = true;
             countdownElement.textContent = 'ОПЕРАЦИЯ НАЧАЛАСЬ!';
             addLogMessage('=== ОПЕРАЦИЯ X АКТИВИРОВАНА! ===', 'yellow-text');
+            
+            // Показать стрелки управления
+            arrowLeft.style.display = 'block';
+            arrowCenter.style.display = 'block';
+            arrowRight.style.display = 'block';
             
             // Запустить логику ИИ
             setInterval(aiLogic, 2000);
@@ -741,13 +874,20 @@
                 gameState.redSoldiers = Math.max(0, gameState.redSoldiers - redLosses);
             });
             
-            // Изменение территории на основе эффективности
+            // Изменение территории на основе эффективности и разницы в силах
+            const totalBlue = gameState.blueSoldiers + gameState.blueDeployment.left + gameState.blueDeployment.center + gameState.blueDeployment.right;
+            const totalRed = gameState.redSoldiers + gameState.redDeployment.left + gameState.redDeployment.center + gameState.redDeployment.right;
+            
+            // Рассчитываем скорость продвижения фронта в зависимости от разницы в силах
+            const forceDifference = totalBlue - totalRed;
+            const advanceSpeed = Math.max(0.1, Math.min(2, 1 + forceDifference / 100000));
+            
             if (blueEffectiveness > redEffectiveness) {
-                gameState.territory += 2;
-                addLogMessage('Ваши войска продвигаются вперед!', 'blue-text');
+                gameState.territory += advanceSpeed;
+                addLogMessage(`Ваши войска продвигаются вперед! (скорость: ${advanceSpeed.toFixed(1)}x)`, 'blue-text');
             } else if (redEffectiveness > blueEffectiveness) {
-                gameState.territory -= 2;
-                addLogMessage('Противник продвигается вперед!', 'red-text');
+                gameState.territory -= advanceSpeed;
+                addLogMessage(`Противник продвигается вперед! (скорость: ${advanceSpeed.toFixed(1)}x)`, 'red-text');
             }
             
             // Добавить сообщения о секторах
@@ -783,6 +923,11 @@
         function endGame(winner) {
             gameState.battleStarted = false;
             
+            // Скрыть стрелки
+            arrowLeft.style.display = 'none';
+            arrowCenter.style.display = 'none';
+            arrowRight.style.display = 'none';
+            
             if (winner === 'blue') {
                 addLogMessage('=== ПОБЕДА! ОПЕРАЦИЯ УСПЕШНО ЗАВЕРШЕНА! ===', 'blue-text');
                 addLogMessage('Вы захватили 90% территории противника!', 'blue-text');
@@ -814,34 +959,61 @@
             }, 1000);
         });
 
-        // Автоматическое распределение солдат
-        function autoDeploy() {
-            if (gameState.blueSoldiers < 5000) return;
-            
-            // Распределяем солдат пропорционально силам противника
-            const totalRed = gameState.redDeployment.left + gameState.redDeployment.center + gameState.redDeployment.right;
-            if (totalRed === 0) return;
-            
-            const leftRatio = gameState.redDeployment.left / totalRed;
-            const centerRatio = gameState.redDeployment.center / totalRed;
-            const rightRatio = gameState.redDeployment.right / totalRed;
-            
-            const deployCount = Math.floor(gameState.blueSoldiers * 0.7);
-            gameState.blueDeployment.left += Math.floor(deployCount * leftRatio);
-            gameState.blueDeployment.center += Math.floor(deployCount * centerRatio);
-            gameState.blueDeployment.right += Math.floor(deployCount * rightRatio);
-            gameState.blueSoldiers -= deployCount;
-            
-            addLogMessage(`Автоматически развернуто ${deployCount.toLocaleString()} солдат по фронту.`, 'blue-text');
-            updateUI();
+        // Обработчики для стрелок
+        arrowLeft.addEventListener('click', () => {
+            if (!gameState.battleStarted) return;
+            gameState.selectedSector = 'left';
+            showSoldierModal('левый фланг');
+        });
+
+        arrowCenter.addEventListener('click', () => {
+            if (!gameState.battleStarted) return;
+            gameState.selectedSector = 'center';
+            showSoldierModal('центр');
+        });
+
+        arrowRight.addEventListener('click', () => {
+            if (!gameState.battleStarted) return;
+            gameState.selectedSector = 'right';
+            showSoldierModal('правый фланг');
+        });
+
+        // Показать модальное окно для ввода солдат
+        function showSoldierModal(sectorName) {
+            modalTitle.textContent = `Отправка подкреплений на ${sectorName}`;
+            soldierInput.value = Math.min(10000, gameState.blueSoldiers);
+            soldierInput.max = gameState.blueSoldiers;
+            soldierModal.style.display = 'flex';
         }
 
-        // Автоматическое распределение каждые 10 секунд после начала битвы
-        setInterval(() => {
-            if (gameState.battleStarted && gameState.blueSoldiers > 10000) {
-                autoDeploy();
+        // Подтверждение отправки солдат
+        confirmDeploy.addEventListener('click', () => {
+            const soldierCount = parseInt(soldierInput.value);
+            
+            if (isNaN(soldierCount) || soldierCount < 1000) {
+                alert('Минимальное количество солдат для отправки - 1000!');
+                return;
             }
-        }, 10000);
+            
+            if (soldierCount > gameState.blueSoldiers) {
+                alert('Недостаточно солдат для отправки!');
+                return;
+            }
+            
+            // Отправляем солдат на выбранный участок
+            gameState.blueDeployment[gameState.selectedSector] += soldierCount;
+            gameState.blueSoldiers -= soldierCount;
+            
+            addLogMessage(`Отправлено ${soldierCount.toLocaleString()} солдат на ${getSectorName(gameState.selectedSector)}.`, 'blue-text');
+            
+            updateUI();
+            soldierModal.style.display = 'none';
+        });
+
+        // Отмена отправки солдат
+        cancelDeploy.addEventListener('click', () => {
+            soldierModal.style.display = 'none';
+        });
 
         // Добавить сообщение в лог
         function addLogMessage(message, cssClass = '') {
