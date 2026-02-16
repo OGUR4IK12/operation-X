@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Война Тысячи Тысяч — Черная Линия</title>
+    <title>Война Тысячи Тысяч — Изогнутая Линия</title>
     <style>
         * {
             margin: 0;
@@ -185,11 +185,11 @@
         
         <!-- Главное меню -->
         <div id="mainMenu">
-            <h1>ЧЕРНАЯ ЛИНИЯ</h1>
+            <h1>ИЗОГНУТАЯ ЛИНИЯ</h1>
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЧЕРНАЯ ПОЛОСА ВПЕРЕДИ ВРАГОВ ⚔️</p>
-                <p style="font-size: 16px; margin-top: 10px;">Она показывает продвижение армии</p>
-                <p style="font-size: 14px; color: #ff6666;">Останови черную линию!</p>
+                <p>⚔️ ЛИНИЯ ИЗГИБАЕТСЯ КАК НИТКА ⚔️</p>
+                <p style="font-size: 16px; margin-top: 10px;">Она повторяет позиции врагов</p>
+                <p style="font-size: 14px; color: #ff6666;">Чем больше врагов - тем сильнее изгиб</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">ВСТУПИТЬ В БОЙ</button>
@@ -209,7 +209,7 @@
                     <span id="enemyScore">0</span>
                 </div>
                 <div class="statItem">
-                    <span>⚫</span>
+                    <span>〰️</span>
                     <span id="blackLinePos">100%</span>
                 </div>
             </div>
@@ -218,7 +218,7 @@
         
         <!-- Экран поражения -->
         <div id="gameOverScreen">
-            <h2>ЧЕРНАЯ ЛИНИЯ ДОШЛА</h2>
+            <h2>ЛИНИЯ ДОШЛА</h2>
             <p style="font-size: 24px; margin: 20px 0;">Вы не остановили наступление</p>
             <button class="menuBtn" onclick="restartGame()">НАЧАТЬ СНАЧАЛА</button>
         </div>
@@ -240,8 +240,9 @@
         let playerScore = 0;
         let enemyScore = 0;
         
-        // Черная линия (линия фронта) - начинается справа и двигается влево
-        let blackLineX = canvas.width - 100; // Начальная позиция - перед врагами
+        // Для изогнутой линии - массив точек
+        let linePoints = [];
+        const SEGMENTS = 30; // Количество сегментов линии
         
         // Класс базы
         class Base {
@@ -391,7 +392,7 @@
                 if (this.type === 'player') {
                     ctx.fillStyle = '#00ff00';
                 } else {
-                    // Враги красные, но с затемнением в зависимости от здоровья
+                    // Враги красные
                     const darkness = 0.5 + (1 - healthPercent) * 0.5;
                     ctx.fillStyle = `rgb(255, ${Math.floor(100 * darkness)}, ${Math.floor(100 * darkness)})`;
                 }
@@ -416,16 +417,6 @@
                 ctx.fillRect(this.x - 12, this.y - 20, 24, 4);
                 ctx.fillStyle = this.type === 'player' ? '#00ff00' : '#ff0000';
                 ctx.fillRect(this.x - 12, this.y - 20, 24 * healthPercent, 4);
-                
-                // Глазок направления
-                ctx.beginPath();
-                ctx.arc(
-                    this.x + (this.targetX - this.x) * 0.2,
-                    this.y,
-                    2, 0, Math.PI * 2
-                );
-                ctx.fillStyle = 'white';
-                ctx.fill();
                 
                 ctx.restore();
             }
@@ -493,7 +484,15 @@
             
             units = [];
             particles = [];
-            blackLineX = canvas.width - 150; // Черная линия перед врагами
+            
+            // Инициализация точек линии
+            linePoints = [];
+            for (let i = 0; i <= SEGMENTS; i++) {
+                linePoints.push({
+                    x: canvas.width - 150,
+                    y: (i / SEGMENTS) * canvas.height
+                });
+            }
         }
         
         // Запуск
@@ -525,8 +524,11 @@
             document.getElementById('playerScore').textContent = playerUnits + playerBaseUnits;
             document.getElementById('enemyScore').textContent = enemyUnits + enemyBaseUnits;
             
-            // Позиция черной линии (чем меньше %, тем ближе враги)
-            const linePercent = Math.floor((blackLineX / canvas.width) * 100);
+            // Средняя позиция линии
+            let avgX = 0;
+            linePoints.forEach(p => avgX += p.x);
+            avgX /= linePoints.length;
+            const linePercent = Math.floor((avgX / canvas.width) * 100);
             document.getElementById('blackLinePos').textContent = linePercent + '%';
         }
         
@@ -593,45 +595,69 @@
             });
         }
         
-        // Обновление черной линии
-        function updateBlackLine() {
-            // Находим самого продвинутого врага (самый левый)
-            let mostAdvancedEnemy = canvas.width;
-            let enemyCount = 0;
+        // Обновление изогнутой линии
+        function updateLinePoints() {
+            const enemyUnits = units.filter(u => u.type === 'enemy');
             
-            units.forEach(u => {
-                if (u.type === 'enemy') {
-                    if (u.x < mostAdvancedEnemy) {
-                        mostAdvancedEnemy = u.x;
+            // Если есть враги, строим линию по ним
+            if (enemyUnits.length > 0) {
+                // Группируем врагов по высоте (y)
+                const yGroups = {};
+                enemyUnits.forEach(unit => {
+                    const yGroup = Math.floor(unit.y / 50) * 50; // Группируем каждые 50 пикселей
+                    if (!yGroups[yGroup]) {
+                        yGroups[yGroup] = [];
                     }
-                    enemyCount++;
-                }
-            });
-            
-            // Находим самого продвинутого игрока (самый правый)
-            let mostAdvancedPlayer = 0;
-            units.forEach(u => {
-                if (u.type === 'player') {
-                    if (u.x > mostAdvancedPlayer) {
-                        mostAdvancedPlayer = u.x;
-                    }
-                }
-            });
-            
-            // Если есть враги, черная линия перед самым продвинутым врагом
-            if (enemyCount > 0) {
-                // Черная линия на 50 пикселей впереди самого продвинутого врага
-                const targetLine = mostAdvancedEnemy - 50;
+                    yGroups[yGroup].push(unit);
+                });
                 
-                // Плавно двигаем линию
-                blackLineX += (targetLine - blackLineX) * 0.05;
+                // Обновляем каждую точку линии
+                for (let i = 0; i <= SEGMENTS; i++) {
+                    const targetY = (i / SEGMENTS) * canvas.height;
+                    
+                    // Ищем врагов рядом с этой высотой
+                    let closestY = null;
+                    let minDist = Infinity;
+                    let closestX = canvas.width - 150; // Значение по умолчанию
+                    
+                    Object.keys(yGroups).forEach(yStr => {
+                        const y = parseInt(yStr);
+                        const dist = Math.abs(y - targetY);
+                        
+                        if (dist < minDist && dist < 100) {
+                            minDist = dist;
+                            closestY = y;
+                            
+                            // Берем среднюю X позицию врагов в этой группе
+                            const unitsInGroup = yGroups[y];
+                            let sumX = 0;
+                            unitsInGroup.forEach(u => sumX += u.x);
+                            closestX = sumX / unitsInGroup.length;
+                        }
+                    });
+                    
+                    // Целевая позиция для точки (на 50 пикселей впереди врагов)
+                    let targetX = closestX - 50;
+                    
+                    // Ограничиваем, чтобы линия не уходила слишком далеко
+                    targetX = Math.max(100, Math.min(canvas.width - 50, targetX));
+                    
+                    // Плавно двигаем точку к цели
+                    linePoints[i].x += (targetX - linePoints[i].x) * 0.05;
+                    
+                    // Вертикальная позиция тоже плавно двигается
+                    linePoints[i].y += (targetY - linePoints[i].y) * 0.1;
+                }
             } else {
                 // Если врагов нет, линия отодвигается назад
-                blackLineX += (canvas.width - 100 - blackLineX) * 0.05;
+                for (let i = 0; i <= SEGMENTS; i++) {
+                    const targetY = (i / SEGMENTS) * canvas.height;
+                    const targetX = canvas.width - 150;
+                    
+                    linePoints[i].x += (targetX - linePoints[i].x) * 0.05;
+                    linePoints[i].y += (targetY - linePoints[i].y) * 0.1;
+                }
             }
-            
-            // Линия не может быть левее 50 (слишком близко к базе игрока)
-            blackLineX = Math.max(100, Math.min(canvas.width - 50, blackLineX));
         }
         
         // Атака баз
@@ -678,6 +704,88 @@
             }
         }
         
+        // Отрисовка изогнутой линии
+        function drawCurvedLine() {
+            ctx.save();
+            
+            // Рисуем изогнутую линию как нитку
+            ctx.beginPath();
+            ctx.moveTo(linePoints[0].x, linePoints[0].y);
+            
+            // Используем кривые Безье для плавности
+            for (let i = 1; i < linePoints.length; i++) {
+                const p1 = linePoints[i - 1];
+                const p2 = linePoints[i];
+                
+                // Контрольные точки для плавного изгиба
+                const cp1x = p1.x + (p2.x - p1.x) * 0.3;
+                const cp1y = p1.y;
+                const cp2x = p1.x + (p2.x - p1.x) * 0.7;
+                const cp2y = p2.y;
+                
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            }
+            
+            // Толстая черная линия
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = '#000000';
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+            
+            // Белая окантовка
+            ctx.beginPath();
+            ctx.moveTo(linePoints[0].x, linePoints[0].y);
+            for (let i = 1; i < linePoints.length; i++) {
+                const p1 = linePoints[i - 1];
+                const p2 = linePoints[i];
+                const cp1x = p1.x + (p2.x - p1.x) * 0.3;
+                const cp1y = p1.y;
+                const cp2x = p1.x + (p2.x - p1.x) * 0.7;
+                const cp2y = p2.y;
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            }
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 0;
+            ctx.stroke();
+            
+            // Красное свечение
+            ctx.beginPath();
+            ctx.moveTo(linePoints[0].x, linePoints[0].y);
+            for (let i = 1; i < linePoints.length; i++) {
+                const p1 = linePoints[i - 1];
+                const p2 = linePoints[i];
+                const cp1x = p1.x + (p2.x - p1.x) * 0.3;
+                const cp1y = p1.y;
+                const cp2x = p1.x + (p2.x - p1.x) * 0.7;
+                const cp2y = p2.y;
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            }
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 1;
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            // Рисуем маленькие узелки на линии (как на нитке)
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff0000';
+            for (let i = 0; i < linePoints.length; i += 3) {
+                ctx.beginPath();
+                ctx.arc(linePoints[i].x, linePoints[i].y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#000000';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+        
         // Игровой цикл
         function gameLoop() {
             if (!gameRunning) return;
@@ -696,14 +804,22 @@
                 // Атака баз
                 attackBases();
                 
-                // Обновление черной линии (самое важное!)
-                updateBlackLine();
+                // Обновление изогнутой линии
+                updateLinePoints();
                 
                 // Частицы
                 particles = particles.filter(p => !p.update());
                 
-                // Проверка поражения (черная линия дошла до баз игрока)
-                if (blackLineX < 150) {
+                // Проверка поражения (любая точка линии слишком близко)
+                let gameOver = false;
+                for (let point of linePoints) {
+                    if (point.x < 120) {
+                        gameOver = true;
+                        break;
+                    }
+                }
+                
+                if (gameOver) {
                     gameRunning = false;
                     document.getElementById('gameOverScreen').style.display = 'block';
                 }
@@ -714,11 +830,11 @@
             // Отрисовка
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Фон (поля битвы)
+            // Фон
             ctx.fillStyle = '#1e3a1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Военная сетка
+            // Сетка
             ctx.strokeStyle = '#2a4a2a';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 50) {
@@ -734,41 +850,8 @@
                 ctx.stroke();
             }
             
-            // *** ЧЕРНАЯ ЛИНИЯ ФРОНТА (самое главное!) ***
-            ctx.save();
-            
-            // Жирная черная линия впереди врагов
-            ctx.beginPath();
-            ctx.moveTo(blackLineX, 0);
-            ctx.lineTo(blackLineX, canvas.height);
-            
-            // Толстая черная линия
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 8;
-            ctx.shadowColor = '#000000';
-            ctx.shadowBlur = 20;
-            ctx.stroke();
-            
-            // Белая окантовка для контраста
-            ctx.beginPath();
-            ctx.moveTo(blackLineX, 0);
-            ctx.lineTo(blackLineX, canvas.height);
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 0;
-            ctx.stroke();
-            
-            // Эффект свечения
-            ctx.beginPath();
-            ctx.moveTo(blackLineX, 0);
-            ctx.lineTo(blackLineX, canvas.height);
-            ctx.strokeStyle = '#ff0000';
-            ctx.lineWidth = 1;
-            ctx.shadowColor = '#ff0000';
-            ctx.shadowBlur = 15;
-            ctx.stroke();
-            
-            ctx.restore();
+            // Рисуем изогнутую линию (самое главное!)
+            drawCurvedLine();
             
             // Базы
             [...playerBases, ...enemyBases].forEach(base => base.draw());
