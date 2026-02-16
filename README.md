@@ -187,9 +187,9 @@
         <div id="mainMenu">
             <h1>ЛИНИЯ ФРОНТА</h1>
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЮНИТЫ НЕ МОГУТ ПЕРЕСЕЧЬ ЛИНИЮ ⚔️</p>
+                <p>⚔️ ЛИНИЯ ДВИГАЕТСЯ ТОЛЬКО ГДЕ ЕСТЬ ЮНИТЫ ⚔️</p>
                 <p style="font-size: 16px; margin-top: 10px;">Кликни по ЗЕЛЕНОЙ базе чтобы создать юнита</p>
-                <p style="font-size: 14px; color: #ff6666;">Линия двигается туда, где больше юнитов</p>
+                <p style="font-size: 14px; color: #ff6666;">Где нет юнитов - линия стоит</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
@@ -242,7 +242,7 @@
         
         // Линия
         let linePoints = [];
-        const SEGMENTS = 30;
+        const SEGMENTS = 40; // Больше сегментов для более точного изгиба
         let baseLineX = canvas.width / 2;
         
         // Класс базы
@@ -342,7 +342,7 @@
                 this.type = type;
                 this.targetX = type === 'player' ? canvas.width - 200 : 100;
                 this.targetY = y;
-                this.speed = type === 'player' ? 0.3 : 0.4; // ОЧЕНЬ МЕДЛЕННО
+                this.speed = type === 'player' ? 0.3 : 0.4;
                 this.health = 200;
                 this.maxHealth = 200;
                 this.damage = 25;
@@ -368,7 +368,7 @@
                 const dy = this.targetY - this.y;
                 const distance = Math.sqrt(dx*dx + dy*dy);
                 
-                if (distance > 2 && !this.inCombat) { // Уменьшил порог
+                if (distance > 2 && !this.inCombat) {
                     const moveX = (dx / distance) * this.speed;
                     const moveY = (dy / distance) * this.speed;
                     
@@ -513,7 +513,8 @@
             for (let i = 0; i <= SEGMENTS; i++) {
                 linePoints.push({
                     x: baseLineX,
-                    y: (i / SEGMENTS) * canvas.height
+                    y: (i / SEGMENTS) * canvas.height,
+                    originalX: baseLineX // Запоминаем исходную позицию
                 });
             }
         }
@@ -559,7 +560,7 @@
             if (!gameRunning || paused) return;
             
             for (let base of enemyBases) {
-                if (Math.random() < 0.02 && base.units > 0) { // Уменьшил шанс спавна
+                if (Math.random() < 0.02 && base.units > 0) {
                     const unit = base.spawnUnit();
                     if (unit) {
                         unit.targetX = baseLineX - 30;
@@ -613,52 +614,62 @@
             });
         }
         
-        // Механика линии
+        // Механика линии - ДВИГАЕТСЯ ТОЛЬКО ГДЕ ЕСТЬ ЮНИТЫ
         function updateLine() {
-            // Считаем сколько юнитов с каждой стороны
-            let playerPower = 0;
-            let enemyPower = 0;
+            // Обновляем базовую линию (она нужна для ограничений)
+            let playerCount = units.filter(u => u.type === 'player').length;
+            let enemyCount = units.filter(u => u.type === 'enemy').length;
             
-            for (let unit of units) {
-                // Чем ближе к линии, тем сильнее влияние
-                const distToLine = Math.abs(unit.x - baseLineX);
-                if (distToLine < 200) {
-                    const influence = (200 - distToLine) / 200;
-                    
-                    if (unit.type === 'player') {
-                        playerPower += influence;
-                    } else {
-                        enemyPower += influence;
-                    }
-                }
+            // Базовая линия двигается очень медленно от общего перевеса
+            let direction = 0;
+            if (playerCount > enemyCount) {
+                direction = 0.1; // Очень медленно
+            } else if (enemyCount > playerCount) {
+                direction = -0.1;
             }
-            
-            // Линия двигается туда, где БОЛЬШЕ юнитов
-            // Если игроков больше - линия идет ВПРАВО (к врагам)
-            // Если врагов больше - линия идет ВЛЕВО (к игроку)
-            let moveDirection = (playerPower - enemyPower) * 0.5; // Уменьшил скорость движения линии
-            baseLineX += moveDirection;
-            
-            // Ограничиваем линию
+            baseLineX += direction;
             baseLineX = Math.max(250, Math.min(1150, baseLineX));
             
-            // Обновляем точки для изгиба
+            // Обновляем каждую точку линии
             for (let i = 0; i <= SEGMENTS; i++) {
-                let targetX = baseLineX;
+                let targetX = baseLineX; // По умолчанию базовая линия
+                let hasUnits = false;
+                let playerInfluence = 0;
+                let enemyInfluence = 0;
                 
-                // Добавляем изгиб от ближайших юнитов
+                // Проверяем всех юнитов рядом с этой точкой
                 for (let unit of units) {
                     const dy = Math.abs(unit.y - linePoints[i].y);
-                    if (dy < 60) {
-                        const influence = (1 - dy / 60) * 8; // Уменьшил изгиб
+                    
+                    // Если юнит близко по вертикали
+                    if (dy < 80) {
+                        hasUnits = true;
+                        const influence = (1 - dy / 80) * 2; // Сила влияния
+                        
                         if (unit.type === 'player') {
-                            targetX += influence; // Игроки тянут вправо
+                            playerInfluence += influence;
                         } else {
-                            targetX -= influence; // Враги тянут влево
+                            enemyInfluence += influence;
                         }
                     }
                 }
                 
+                // Если есть юниты рядом, линия двигается
+                if (hasUnits) {
+                    // Разница влияния (игроки тянут вправо, враги влево)
+                    const diff = playerInfluence - enemyInfluence;
+                    
+                    // Двигаем точку в зависимости от перевеса
+                    targetX = linePoints[i].x + diff * 2;
+                    
+                    // Ограничиваем от базовой линии (не может уйти слишком далеко)
+                    targetX = Math.max(baseLineX - 50, Math.min(baseLineX + 50, targetX));
+                } else {
+                    // Если нет юнитов, точка возвращается к базовой линии
+                    targetX = baseLineX;
+                }
+                
+                // Плавно двигаем точку
                 linePoints[i].x += (targetX - linePoints[i].x) * 0.1;
             }
         }
@@ -829,7 +840,7 @@
                     
                     if (dist < base.radius) {
                         if (base.units > 0) {
-                            for (let i = 0; i < 2; i++) { // Уменьшил до 2 за клик
+                            for (let i = 0; i < 2; i++) {
                                 if (base.units > 0) {
                                     const unit = base.spawnUnit();
                                     if (unit) {
