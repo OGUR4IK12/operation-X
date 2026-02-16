@@ -187,9 +187,9 @@
         <div id="mainMenu">
             <h1>ЛИНИЯ ФРОНТА</h1>
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЮНИТЫ НЕ МОГУТ ПЕРЕСЕЧЬ ЛИНИЮ ⚔️</p>
+                <p>⚔️ ЮНИТЫ ИДУТ ВПЕРЕД - ЛИНИЯ ТОЖЕ ⚔️</p>
                 <p style="font-size: 16px; margin-top: 10px;">Кликни по ЗЕЛЕНОЙ базе чтобы создать юнита</p>
-                <p style="font-size: 14px; color: #ff6666;">Линия изгибается где идут юниты</p>
+                <p style="font-size: 14px; color: #ff6666;">Линия двигается туда же куда и юниты</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
@@ -240,7 +240,7 @@
         let playerScore = 0;
         let enemyScore = 0;
         
-        // Линия - теперь массив точек для изгиба
+        // Линия - массив точек для изгиба
         let linePoints = [];
         const SEGMENTS = 30;
         let baseLineX = canvas.width / 2; // Базовая позиция линии
@@ -540,7 +540,6 @@
                         unit.targetX = baseLineX - 50; // Идут к линии
                         unit.targetY = 200 + Math.random() * 400;
                         units.push(unit);
-                        console.log('Враг создан'); // Для отладки
                     }
                 }
             }
@@ -589,19 +588,29 @@
             });
         }
         
-        // ИСПРАВЛЕННАЯ МЕХАНИКА ЛИНИИ
+        // ИСПРАВЛЕННАЯ МЕХАНИКА ЛИНИИ - ТЕПЕРЬ В ПРАВИЛЬНУЮ СТОРОНУ
         function updateLine() {
-            // Считаем перевес сил для движения базовой линии
-            let playerCount = units.filter(u => u.type === 'player').length;
-            let enemyCount = units.filter(u => u.type === 'enemy').length;
+            // Считаем общее направление движения юнитов
+            let playerDirection = 0;
+            let enemyDirection = 0;
             
-            // Разница в количестве (враги - игроки)
-            let diff = enemyCount - playerCount;
+            for (let unit of units) {
+                if (unit.type === 'player') {
+                    // Игроки идут ВПРАВО (к врагу)
+                    playerDirection++;
+                } else {
+                    // Враги идут ВЛЕВО (к игроку)
+                    enemyDirection++;
+                }
+            }
             
-            // Базовая линия двигается в сторону СЛАБЕЙШЕГО
-            // Если врагов больше - линия идет ВЛЕВО (к игроку)
-            // Если игроков больше - линия идет ВПРАВО (к врагу)
-            baseLineX += diff * 0.2;
+            // Линия двигается ТУДА ЖЕ, КУДА И ЮНИТЫ
+            // Если больше игроков - линия идет ВПРАВО
+            // Если больше врагов - линия идет ВЛЕВО
+            let moveDirection = playerDirection - enemyDirection;
+            
+            // Применяем движение к базовой линии
+            baseLineX += moveDirection * 0.3;
             
             // Ограничиваем базовую линию
             baseLineX = Math.max(250, Math.min(1150, baseLineX));
@@ -609,32 +618,23 @@
             // Теперь обновляем каждую точку для изгиба
             for (let i = 0; i <= SEGMENTS; i++) {
                 let targetX = baseLineX;
-                let totalInfluence = 0;
                 
                 // Ищем юнитов рядом с этой высотой
                 for (let unit of units) {
                     const dy = Math.abs(unit.y - linePoints[i].y);
                     
                     // Если юнит близко по вертикали
-                    if (dy < 100) {
+                    if (dy < 80) {
                         // Сила влияния зависит от расстояния
-                        const influence = (1 - dy / 100) * 30;
+                        const influence = (1 - dy / 80) * 20;
                         
-                        // ЮНИТЫ ТЯНУТ ЛИНИЮ ЗА СОБОЙ
-                        // Если юнит справа от линии - тянет вправо
-                        // Если юнит слева от линии - тянет влево
-                        if (unit.x > linePoints[i].x) {
-                            targetX += influence;
+                        // ЮНИТЫ ТЯНУТ ЛИНИЮ В ТУ ЖЕ СТОРОНУ, КУДА ИДУТ
+                        if (unit.type === 'player') {
+                            targetX += influence; // Игроки тянут вправо
                         } else {
-                            targetX -= influence;
+                            targetX -= influence; // Враги тянут влево
                         }
-                        totalInfluence++;
                     }
-                }
-                
-                // Если много влияния, усредняем
-                if (totalInfluence > 0) {
-                    targetX = targetX / (totalInfluence + 1) + baseLineX * totalInfluence / (totalInfluence + 1);
                 }
                 
                 // Плавно двигаем точку
@@ -763,7 +763,7 @@
                 
                 particles = particles.filter(p => !p.update());
                 
-                // Проверка поражения (средняя точка линии)
+                // Проверка поражения
                 let avgX = 0;
                 linePoints.forEach(p => avgX += p.x);
                 avgX /= linePoints.length;
@@ -799,7 +799,7 @@
                 ctx.stroke();
             }
             
-            // Рисуем ИЗОГНУТУЮ линию
+            // Рисуем линию
             drawLine();
             
             // Базы
@@ -826,8 +826,6 @@
             const mouseY = (e.clientY - rect.top) * scaleY;
             
             if (e.button === 0) { // ЛКМ
-                console.log('Клик по canvas'); // Для отладки
-                
                 // Проверяем базы игрока
                 for (let base of playerBases) {
                     const dx = mouseX - base.x;
@@ -835,18 +833,15 @@
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     
                     if (dist < base.radius) {
-                        console.log('Клик по базе, юнитов:', base.units);
-                        
                         if (base.units > 0) {
                             // Создаем 3 юнита за клик
                             for (let i = 0; i < 3; i++) {
                                 if (base.units > 0) {
                                     const unit = base.spawnUnit();
                                     if (unit) {
-                                        unit.targetX = baseLineX + 30; // Идут к линии
+                                        unit.targetX = baseLineX + 50; // Идут к линии и дальше
                                         unit.targetY = 200 + Math.random() * 400;
                                         units.push(unit);
-                                        console.log('Юнит создан');
                                     }
                                 }
                             }
