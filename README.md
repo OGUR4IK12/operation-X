@@ -599,33 +599,39 @@
             });
         }
         
-        // ИСПРАВЛЕННАЯ МЕХАНИКА ЛИНИИ
+        // Обновление линии - ГЛАВНАЯ МЕХАНИКА!
         function updateLine() {
-            // Считаем количество юнитов с каждой стороны
-            let playerCount = 0;
-            let enemyCount = 0;
+            // Считаем давление с каждой стороны
+            let playerPressure = 0;
+            let enemyPressure = 0;
             
             for (let unit of units) {
-                if (unit.type === 'player') {
-                    playerCount++;
-                } else {
-                    enemyCount++;
+                // Чем ближе юнит к линии, тем сильнее давление
+                const distanceToLine = Math.abs(unit.x - lineX);
+                if (distanceToLine < 200) {
+                    const pressure = (200 - distanceToLine) / 200; // Максимум 1, минимум 0
+                    
+                    if (unit.type === 'player') {
+                        playerPressure += pressure;
+                    } else {
+                        enemyPressure += pressure;
+                    }
                 }
             }
             
-            // Разница в количестве
-            let diff = enemyCount - playerCount;
+            // Линия двигается в зависимости от разницы давления
+            const pressureDiff = enemyPressure - playerPressure;
             
-            // Линия двигается в зависимости от перевеса
-            // Если врагов больше - линия идет ВЛЕВО (к игроку)
-            // Если игроков больше - линия идет ВПРАВО (к врагу)
-            targetLineX += diff * 0.3;
+            // Линия двигается в сторону слабейшего
+            // Если больше врагов - линия идет влево (к игроку)
+            // Если больше игроков - линия идет вправо (к врагу)
+            targetLineX += pressureDiff * 2;
             
             // Ограничиваем движение линии
-            targetLineX = Math.max(250, Math.min(1150, targetLineX));
+            targetLineX = Math.max(250, Math.min(canvas.width - 250, targetLineX));
             
             // Плавно двигаем линию
-            lineX += (targetLineX - lineX) * 0.05;
+            lineX += (targetLineX - lineX) * 0.1;
         }
         
         // Атака баз
