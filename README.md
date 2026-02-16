@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Война Тысячи Тысяч — Линия Впереди</title>
+    <title>Война Тысячи Тысяч — Линия Только Перед Юнитами</title>
     <style>
         * {
             margin: 0;
@@ -187,9 +187,9 @@
         <div id="mainMenu">
             <h1>ЧЕРНАЯ ЛИНИЯ</h1>
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЛИНИЯ ВСЕГДА ВПЕРЕДИ ⚔️</p>
+                <p>⚔️ ЛИНИЯ ТОЛЬКО ПЕРЕД ЮНИТАМИ ⚔️</p>
                 <p style="font-size: 16px; margin-top: 10px;">Кликни по ЗЕЛЕНОЙ базе чтобы создать юнита</p>
-                <p style="font-size: 14px; color: #ff6666;">Черная линия на 70 пикселей впереди врагов</p>
+                <p style="font-size: 14px; color: #ff6666;">Нет юнитов - нет линии!</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
@@ -210,7 +210,7 @@
                 </div>
                 <div class="statItem">
                     <span>⚫</span>
-                    <span id="blackLinePos">100%</span>
+                    <span id="blackLinePos">0%</span>
                 </div>
             </div>
             <button id="pauseBtn" onclick="togglePause()">ПАУЗА</button>
@@ -243,6 +243,7 @@
         // Для изогнутой линии
         let linePoints = [];
         const SEGMENTS = 30;
+        let lineVisible = false; // Флаг видимости линии
         
         // Класс базы
         class Base {
@@ -252,9 +253,9 @@
                 this.type = type;
                 this.health = 250;
                 this.maxHealth = 250;
-                this.units = type === 'player' ? 15 : 20; // Увеличил начальные юниты
-                this.maxUnits = 30;
-                this.spawnRate = 0.04;
+                this.units = type === 'player' ? 20 : 25;
+                this.maxUnits = 40;
+                this.spawnRate = 0.05;
                 this.spawnProgress = 0;
                 this.radius = 35;
                 this.pulsePhase = Math.random() * Math.PI * 2;
@@ -333,7 +334,7 @@
             }
         }
         
-        // Класс юнита - ЗДЕСЬ УМЕНЬШИЛ СКОРОСТЬ
+        // Класс юнита
         class Unit {
             constructor(x, y, type) {
                 this.x = x;
@@ -341,12 +342,12 @@
                 this.type = type;
                 this.targetX = type === 'player' ? canvas.width - 200 : 100;
                 this.targetY = y;
-                this.speed = type === 'player' ? 1.2 : 1.5; // Сильно уменьшил скорость
-                this.health = 80;
-                this.maxHealth = 80;
-                this.damage = 10;
+                this.speed = type === 'player' ? 1.0 : 1.3; // Еще медленнее
+                this.health = 100;
+                this.maxHealth = 100;
+                this.damage = 12;
                 this.attackCooldown = 0;
-                this.attackRange = 35;
+                this.attackRange = 40;
                 this.radius = 12;
                 this.isSelected = false;
                 this.inCombat = false;
@@ -420,7 +421,7 @@
             attack(target) {
                 if (this.attackCooldown <= 0) {
                     target.health -= this.damage;
-                    this.attackCooldown = 20;
+                    this.attackCooldown = 25;
                     
                     particles.push(new Particle(
                         target.x, target.y,
@@ -479,8 +480,9 @@
             
             units = [];
             particles = [];
+            lineVisible = false;
             
-            // Инициализация точек линии
+            // Инициализация точек линии (но они не видны пока)
             linePoints = [];
             for (let i = 0; i <= SEGMENTS; i++) {
                 linePoints.push({
@@ -519,12 +521,14 @@
             document.getElementById('playerScore').textContent = playerUnits + playerBaseUnits;
             document.getElementById('enemyScore').textContent = enemyUnits + enemyBaseUnits;
             
-            if (linePoints.length > 0) {
+            if (linePoints.length > 0 && lineVisible) {
                 let avgX = 0;
                 linePoints.forEach(p => avgX += p.x);
                 avgX /= linePoints.length;
                 const linePercent = Math.floor((avgX / canvas.width) * 100);
                 document.getElementById('blackLinePos').textContent = linePercent + '%';
+            } else {
+                document.getElementById('blackLinePos').textContent = '0%';
             }
         }
         
@@ -587,9 +591,12 @@
             });
         }
         
-        // Обновление линии - ТЕПЕРЬ ЛИНИЯ ВСЕГДА ВПЕРЕДИ
+        // Обновление линии - ТОЛЬКО ПЕРЕД ЮНИТАМИ!
         function updateLinePoints() {
             const enemyUnits = units.filter(u => u.type === 'enemy');
+            
+            // Линия видна только если есть враги
+            lineVisible = enemyUnits.length > 0;
             
             if (enemyUnits.length > 0) {
                 // Группируем врагов по Y
@@ -606,9 +613,10 @@
                 for (let i = 0; i <= SEGMENTS; i++) {
                     const targetY = (i / SEGMENTS) * canvas.height;
                     
-                    let closestX = canvas.width - 200;
+                    let closestX = null;
                     let minDist = Infinity;
                     
+                    // Ищем ближайшую группу врагов к этой высоте
                     Object.keys(yGroups).forEach(yStr => {
                         const y = parseInt(yStr);
                         const dist = Math.abs(y - targetY);
@@ -621,28 +629,22 @@
                             unitsInGroup.forEach(u => sumX += u.x);
                             const avgX = sumX / unitsInGroup.length;
                             
-                            // ГЛАВНОЕ: линия на 70 пикселей ВПЕРЕДИ врагов
-                            closestX = avgX - 70;
+                            // Линия на 60 пикселей ВПЕРЕДИ врагов
+                            closestX = avgX - 60;
                         }
                     });
                     
-                    // Ограничения
-                    closestX = Math.max(150, Math.min(canvas.width - 100, closestX));
-                    
-                    // Плавное движение
-                    linePoints[i].x += (closestX - linePoints[i].x) * 0.03;
-                    linePoints[i].y += (targetY - linePoints[i].y) * 0.05;
-                }
-            } else {
-                // Если врагов нет, линия отодвигается
-                for (let i = 0; i <= SEGMENTS; i++) {
-                    const targetY = (i / SEGMENTS) * canvas.height;
-                    const targetX = canvas.width - 200;
-                    
-                    linePoints[i].x += (targetX - linePoints[i].x) * 0.02;
-                    linePoints[i].y += (targetY - linePoints[i].y) * 0.05;
+                    if (closestX !== null) {
+                        // Ограничения
+                        closestX = Math.max(150, Math.min(canvas.width - 100, closestX));
+                        
+                        // Плавное движение к цели
+                        linePoints[i].x += (closestX - linePoints[i].x) * 0.05;
+                        linePoints[i].y += (targetY - linePoints[i].y) * 0.1;
+                    }
                 }
             }
+            // Если врагов нет - линия остается на месте (но не видна)
         }
         
         // Атака баз
@@ -655,7 +657,7 @@
                         const dx = unit.x - base.x;
                         const dy = unit.y - base.y;
                         if (Math.sqrt(dx*dx + dy*dy) < 60) {
-                            base.health -= unit.damage;
+                            base.health -= unit.damage * 2;
                             units.splice(i, 1);
                             
                             if (base.health <= 0) {
@@ -672,7 +674,7 @@
                         const dx = unit.x - base.x;
                         const dy = unit.y - base.y;
                         if (Math.sqrt(dx*dx + dy*dy) < 60) {
-                            base.health -= unit.damage;
+                            base.health -= unit.damage * 2;
                             units.splice(i, 1);
                             
                             if (base.health <= 0) {
@@ -690,7 +692,7 @@
         
         // Отрисовка линии
         function drawCurvedLine() {
-            if (linePoints.length < 2) return;
+            if (!lineVisible || linePoints.length < 2) return;
             
             ctx.save();
             
@@ -767,22 +769,19 @@
                 spawnEnemies();
                 updateCombat();
                 attackBases();
-                updateLinePoints(); // Обновляем линию
+                updateLinePoints(); // Обновляем линию ТОЛЬКО по врагам
                 
                 particles = particles.filter(p => !p.update());
                 
                 // Проверка поражения
-                let gameOver = false;
-                for (let point of linePoints) {
-                    if (point.x < 150) {
-                        gameOver = true;
-                        break;
+                if (lineVisible) {
+                    for (let point of linePoints) {
+                        if (point.x < 150) {
+                            gameRunning = false;
+                            document.getElementById('gameOverScreen').style.display = 'block';
+                            break;
+                        }
                     }
-                }
-                
-                if (gameOver) {
-                    gameRunning = false;
-                    document.getElementById('gameOverScreen').style.display = 'block';
                 }
                 
                 updateUI();
@@ -811,7 +810,7 @@
                 ctx.stroke();
             }
             
-            // Рисуем линию
+            // Рисуем линию ТОЛЬКО если есть враги
             drawCurvedLine();
             
             // Базы
@@ -826,7 +825,7 @@
             requestAnimationFrame(gameLoop);
         }
         
-        // Обработка кликов - ИСПРАВЛЕН СПАВН!
+        // Обработка кликов
         canvas.addEventListener('mousedown', (e) => {
             if (!gameRunning || paused) return;
             
@@ -838,38 +837,31 @@
             const mouseY = (e.clientY - rect.top) * scaleY;
             
             if (e.button === 0) { // ЛКМ
-                console.log('Клик по canvas', mouseX, mouseY); // Для отладки
-                
-                // Проверяем все базы игрока
+                // Проверяем базы игрока
                 for (let base of playerBases) {
                     const dx = mouseX - base.x;
                     const dy = mouseY - base.y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     
                     if (dist < base.radius) {
-                        console.log('Клик по базе! Юнитов в базе:', base.units);
-                        
                         if (base.units > 0) {
-                            // Создаем 3 юнита за клик (для теста)
-                            for (let i = 0; i < 3; i++) {
+                            // Создаем 2 юнита за клик
+                            for (let i = 0; i < 2; i++) {
                                 if (base.units > 0) {
                                     const unit = base.spawnUnit();
                                     if (unit) {
                                         unit.targetX = canvas.width - 300;
                                         unit.targetY = 200 + Math.random() * 500;
                                         units.push(unit);
-                                        console.log('Создан юнит! Осталось юнитов в базе:', base.units);
                                     }
                                 }
                             }
-                        } else {
-                            console.log('Нет юнитов в базе');
                         }
-                        return; // Выходим после обработки базы
+                        return;
                     }
                 }
                 
-                // Выделение юнитов (если не кликнули по базе)
+                // Выделение юнитов
                 let clickedUnit = null;
                 for (let unit of units) {
                     if (unit.type === 'player') {
