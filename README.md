@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Война Тысячи Тысяч</title>
+    <title>Война Тысячи Тысяч — Линия Фронта</title>
     <style>
         * {
             margin: 0;
@@ -22,10 +22,10 @@
         
         #gameWrapper {
             position: relative;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 30px rgba(255, 100, 100, 0.3);
             border-radius: 20px;
             overflow: hidden;
-            border: 3px solid #3a5a3a;
+            border: 3px solid #5a3a3a;
         }
         
         canvas {
@@ -48,24 +48,24 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
-            border: 3px solid #5a7a5a;
+            border: 3px solid #7a5a5a;
             border-radius: 20px;
         }
         
         #mainMenu h1 {
-            color: #7aff7a;
+            color: #ff7a7a;
             font-size: 64px;
-            text-shadow: 0 0 20px #00ff00;
+            text-shadow: 0 0 20px #ff0000;
             margin-bottom: 20px;
             letter-spacing: 4px;
             font-family: 'Courier New', monospace;
-            border-right: 4px solid #7aff7a;
+            border-right: 4px solid #ff7a7a;
             padding-right: 10px;
             animation: blink 1s infinite;
         }
         
         @keyframes blink {
-            0%, 100% { border-color: #7aff7a; }
+            0%, 100% { border-color: #ff7a7a; }
             50% { border-color: transparent; }
         }
         
@@ -77,8 +77,8 @@
         
         .menuBtn {
             background: transparent;
-            color: #7aff7a;
-            border: 2px solid #7aff7a;
+            color: #ff7a7a;
+            border: 2px solid #ff7a7a;
             padding: 15px 40px;
             font-size: 24px;
             font-family: 'Courier New', monospace;
@@ -87,17 +87,17 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 0 10px rgba(122, 255, 122, 0.3);
+            box-shadow: 0 0 10px rgba(255, 122, 122, 0.3);
         }
         
         .menuBtn:hover {
-            background: #7aff7a;
+            background: #ff7a7a;
             color: #0a1a0a;
-            box-shadow: 0 0 30px #7aff7a;
+            box-shadow: 0 0 30px #ff7a7a;
             transform: scale(1.1);
         }
         
-        /* Интерфейс во время игры */
+        /* Интерфейс */
         #gameUI {
             position: absolute;
             top: 10px;
@@ -105,13 +105,13 @@
             right: 10px;
             display: flex;
             justify-content: space-between;
-            color: #7aff7a;
+            color: #ff7a7a;
             font-size: 20px;
-            text-shadow: 0 0 10px #00ff00;
-            background: rgba(20, 30, 20, 0.7);
+            text-shadow: 0 0 10px #ff0000;
+            background: rgba(30, 20, 20, 0.7);
             padding: 15px 25px;
             border-radius: 50px;
-            border: 2px solid #5a7a5a;
+            border: 2px solid #7a5a5a;
             backdrop-filter: blur(5px);
             z-index: 5;
             font-family: 'Courier New', monospace;
@@ -140,8 +140,8 @@
         
         #pauseBtn {
             background: transparent;
-            color: #7aff7a;
-            border: 2px solid #7aff7a;
+            color: #ff7a7a;
+            border: 2px solid #ff7a7a;
             padding: 5px 20px;
             font-family: 'Courier New', monospace;
             font-size: 18px;
@@ -151,8 +151,8 @@
         }
         
         #pauseBtn:hover {
-            background: #7aff7a;
-            color: #1a2a1a;
+            background: #ff7a7a;
+            color: #1a1a1a;
         }
         
         /* Панель управления */
@@ -161,8 +161,8 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 30, 20, 0.9);
-            border: 2px solid #5a7a5a;
+            background: rgba(30, 20, 20, 0.9);
+            border: 2px solid #7a5a5a;
             border-radius: 50px;
             padding: 10px 20px;
             display: flex;
@@ -173,8 +173,8 @@
         
         .controlBtn {
             background: transparent;
-            color: #7aff7a;
-            border: 1px solid #7aff7a;
+            color: #ff7a7a;
+            border: 1px solid #ff7a7a;
             padding: 8px 20px;
             font-family: 'Courier New', monospace;
             font-size: 16px;
@@ -184,21 +184,17 @@
         }
         
         .controlBtn:hover {
-            background: #7aff7a;
-            color: #1a2a1a;
+            background: #ff7a7a;
+            color: #1a1a1a;
         }
         
-        .controlBtn.active {
-            background: #7aff7a;
-            color: #1a2a1a;
-        }
-        
+        /* Экран поражения */
         #gameOverScreen {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(10, 20, 10, 0.95);
+            background: rgba(30, 10, 10, 0.95);
             border: 3px solid #ff4f4f;
             border-radius: 20px;
             padding: 40px;
@@ -214,44 +210,27 @@
             margin-bottom: 20px;
             text-shadow: 0 0 20px #ff0000;
         }
-        
-        #gameOverScreen button {
-            background: transparent;
-            color: #ff4f4f;
-            border: 2px solid #ff4f4f;
-            padding: 10px 30px;
-            font-size: 24px;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
-        }
-        
-        #gameOverScreen button:hover {
-            background: #ff4f4f;
-            color: #0a1a0a;
-        }
     </style>
 </head>
 <body>
     <div id="gameWrapper">
-        <canvas id="gameCanvas" width="1200" height="700"></canvas>
+        <canvas id="gameCanvas" width="1400" height="800"></canvas>
         
         <!-- Главное меню -->
         <div id="mainMenu">
-            <h1>ВОЙНА ТЫСЯЧИ ТЫСЯЧ</h1>
-            <div style="color: #7aff7a; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЗАЩИТИ СВОИ ЗЕМЛИ ⚔️</p>
-                <p style="font-size: 16px; margin-top: 10px;">Кликай по своим базам чтобы создать юнитов</p>
-                <p style="font-size: 14px; color: #5a9a5a;">Враг атакует волнами!</p>
+            <h1>ЛИНИЯ ФРОНТА</h1>
+            <div style="color: #ff7a7a; font-size: 20px; margin-bottom: 30px; text-align: center;">
+                <p>⚔️ УДЕРЖИ ЛИНИЮ ОБОРОНЫ ⚔️</p>
+                <p style="font-size: 16px; margin-top: 10px;">Кликай по базам чтобы создать юнитов</p>
+                <p style="font-size: 14px; color: #ff9a9a;">Красная линия — фронт</p>
             </div>
             <div class="menuButtons">
-                <button class="menuBtn" onclick="startGame()">НАЧАТЬ ВОЙНУ</button>
+                <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
                 <button class="menuBtn" onclick="location.reload()">ВЫХОД</button>
             </div>
         </div>
         
-        <!-- Интерфейс игры -->
+        <!-- Интерфейс -->
         <div id="gameUI" style="display: none;">
             <div class="statBlock">
                 <div class="statItem">
@@ -263,25 +242,18 @@
                     <span id="enemyScore">0</span>
                 </div>
                 <div class="statItem">
-                    <span>⚔️</span>
-                    <span id="waveCounter">1</span>
+                    <span>📊</span>
+                    <span id="frontLinePos">50%</span>
                 </div>
             </div>
             <button id="pauseBtn" onclick="togglePause()">ПАУЗА</button>
         </div>
         
-        <!-- Панель управления -->
-        <div id="controlPanel" style="display: none;">
-            <button class="controlBtn" onclick="spawnUnitAtBase()">➕ СОЗДАТЬ ЮНИТА</button>
-            <button class="controlBtn" onclick="upgradeBase()">⬆️ УЛУЧШИТЬ БАЗУ</button>
-            <button class="controlBtn active" onclick="toggleAutoSpawn()">🔄 АВТОСПАВН</button>
-        </div>
-        
         <!-- Экран поражения -->
         <div id="gameOverScreen">
-            <h2>ВЫ ПРОИГРАЛИ</h2>
-            <p style="font-size: 24px; margin: 20px 0;">Волна <span id="finalWave">1</span></p>
-            <button onclick="restartGame()">НАЧАТЬ СНАЧАЛА</button>
+            <h2>ЛИНИЯ ПРОРВАНА</h2>
+            <p style="font-size: 24px; margin: 20px 0;">Вы погибли в бою</p>
+            <button class="menuBtn" onclick="restartGame()">НАЧАТЬ СНАЧАЛА</button>
         </div>
     </div>
 
@@ -292,37 +264,33 @@
         // Состояние игры
         let gameRunning = false;
         let paused = false;
-        let gameObjects = [];
         let playerBases = [];
         let enemyBases = [];
         let units = [];
         let particles = [];
         
+        // Статистика
         let playerScore = 0;
         let enemyScore = 0;
-        let waveNumber = 1;
-        let autoSpawnEnabled = true;
+        let frontLineX = canvas.width / 2; // Линия фронта
         
         // Класс базы
         class Base {
-            constructor(x, y, type) { // type: 'player' или 'enemy'
+            constructor(x, y, type) {
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.health = 100;
-                this.maxHealth = 100;
-                this.units = type === 'player' ? 8 : 5;
-                this.maxUnits = 15;
-                this.spawnRate = 0.02;
+                this.health = 200;
+                this.maxHealth = 200;
+                this.units = type === 'player' ? 10 : 15;
+                this.maxUnits = 20;
+                this.spawnRate = 0.03;
                 this.spawnProgress = 0;
-                this.level = 1;
-                
-                // Визуальные эффекты
+                this.radius = 35;
                 this.pulsePhase = Math.random() * Math.PI * 2;
             }
             
             update() {
-                // Спавн юнитов
                 if (this.units < this.maxUnits) {
                     this.spawnProgress += this.spawnRate;
                     if (this.spawnProgress >= 1) {
@@ -330,7 +298,6 @@
                         this.spawnProgress = 0;
                     }
                 }
-                
                 this.pulsePhase += 0.05;
             }
             
@@ -338,8 +305,8 @@
                 if (this.units > 0) {
                     this.units--;
                     return new Unit(
-                        this.x + (Math.random() - 0.5) * 40,
-                        this.y + (Math.random() - 0.5) * 40,
+                        this.x + (Math.random() - 0.5) * 50,
+                        this.y + (Math.random() - 0.5) * 50,
                         this.type
                     );
                 }
@@ -347,19 +314,17 @@
             }
             
             draw() {
-                // Рисуем базу
                 ctx.save();
                 
-                // Пульсирующий ореол
+                // Пульсация
                 ctx.shadowColor = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
-                ctx.shadowBlur = 20 + Math.sin(this.pulsePhase) * 10;
+                ctx.shadowBlur = 30 + Math.sin(this.pulsePhase) * 10;
                 
-                // Основа базы
+                // База
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 
-                // Градиент
-                const gradient = ctx.createRadialGradient(this.x - 10, this.y - 10, 5, this.x, this.y, 40);
+                const gradient = ctx.createRadialGradient(this.x - 10, this.y - 10, 5, this.x, this.y, 45);
                 if (this.type === 'player') {
                     gradient.addColorStop(0, '#7aff7a');
                     gradient.addColorStop(1, '#2a5a2a');
@@ -370,26 +335,24 @@
                 
                 ctx.fillStyle = gradient;
                 ctx.fill();
-                
-                // Обводка
                 ctx.strokeStyle = 'white';
                 ctx.lineWidth = 3;
                 ctx.stroke();
                 
-                // Уровень базы
+                // Количество юнитов
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 20px "Courier New"';
+                ctx.font = 'bold 24px "Courier New"';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(this.units, this.x, this.y);
                 
                 // Полоска здоровья
                 ctx.fillStyle = '#333';
-                ctx.fillRect(this.x - 25, this.y - 45, 50, 8);
+                ctx.fillRect(this.x - 30, this.y - 50, 60, 8);
                 const healthPercent = this.health / this.maxHealth;
                 ctx.fillStyle = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
-                ctx.fillRect(this.x - 25, this.y - 45, 50 * healthPercent, 8);
+                ctx.fillRect(this.x - 30, this.y - 50, 60 * healthPercent, 8);
                 
                 ctx.restore();
             }
@@ -406,17 +369,19 @@
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.targetX = x;
+                this.targetX = type === 'player' ? canvas.width - 100 : 100;
                 this.targetY = y;
-                this.speed = type === 'player' ? 2.5 : 2;
-                this.health = 20;
-                this.damage = 10;
-                this.radius = 8;
+                this.speed = type === 'player' ? 2 : 2.2;
+                this.health = 50;
+                this.maxHealth = 50;
+                this.damage = 7;
+                this.attackCooldown = 0;
+                this.attackRange = 25;
+                this.radius = 10;
                 this.isSelected = false;
                 
-                // Для движения линией (красные идут строем)
-                this.formationX = 0;
-                this.formationY = 0;
+                // Для построения в линию
+                this.inCombat = false;
             }
             
             setTarget(tx, ty) {
@@ -425,53 +390,68 @@
             }
             
             update() {
+                if (this.attackCooldown > 0) {
+                    this.attackCooldown--;
+                }
+                
                 // Движение к цели
                 const dx = this.targetX - this.x;
                 const dy = this.targetY - this.y;
                 const distance = Math.sqrt(dx*dx + dy*dy);
                 
-                if (distance > 2) {
+                if (distance > 5 && !this.inCombat) {
                     const moveX = (dx / distance) * this.speed;
                     const moveY = (dy / distance) * this.speed;
                     this.x += moveX;
                     this.y += moveY;
                 }
+                
+                // Ограничение по краям
+                this.x = Math.max(20, Math.min(canvas.width - 20, this.x));
+                this.y = Math.max(20, Math.min(canvas.height - 20, this.y));
             }
             
-            draw(isInFormation = false) {
+            draw() {
                 ctx.save();
                 
-                // Тень/ореол
+                // Здоровье
+                const healthPercent = this.health / this.maxHealth;
+                
+                // Цвет в зависимости от здоровья
+                let color;
+                if (this.type === 'player') {
+                    color = `rgb(${Math.floor(100 + 155 * (1 - healthPercent))}, 255, ${Math.floor(100 + 155 * (1 - healthPercent))})`;
+                } else {
+                    color = `rgb(255, ${Math.floor(100 + 155 * (1 - healthPercent))}, ${Math.floor(100 + 155 * (1 - healthPercent))})`;
+                }
+                
+                // Тень
                 ctx.shadowColor = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
                 ctx.shadowBlur = 15;
                 
-                // Рисуем юнита
+                // Юнит
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                
-                // Градиент
-                const gradient = ctx.createRadialGradient(this.x - 3, this.y - 3, 2, this.x, this.y, this.radius + 5);
-                if (this.type === 'player') {
-                    gradient.addColorStop(0, '#b2ffb2');
-                    gradient.addColorStop(1, '#3a7a3a');
-                } else {
-                    gradient.addColorStop(0, '#ff8080');
-                    gradient.addColorStop(1, '#7a3a3a');
-                }
-                
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = color;
                 ctx.fill();
                 
-                // Обводка (золотая если выбран)
+                // Обводка
                 ctx.strokeStyle = this.isSelected ? '#ffd700' : 'white';
                 ctx.lineWidth = this.isSelected ? 3 : 2;
                 ctx.stroke();
                 
-                // Линия движения для врагов (красная линия впереди)
-                if (this.type === 'enemy' && !isInFormation) {
+                // Полоска здоровья
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x - 12, this.y - 18, 24, 4);
+                ctx.fillStyle = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
+                ctx.fillRect(this.x - 12, this.y - 18, 24 * healthPercent, 4);
+                
+                // Красная линия впереди для врагов
+                if (this.type === 'enemy' && !this.inCombat) {
                     ctx.beginPath();
                     ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(this.targetX, this.targetY);
+                    ctx.lineTo(this.targetX, this.y);
                     ctx.strokeStyle = '#ff4f4f';
                     ctx.lineWidth = 2;
                     ctx.setLineDash([5, 5]);
@@ -479,36 +459,36 @@
                     ctx.setLineDash([]);
                 }
                 
-                // Глазок направления
-                ctx.shadowBlur = 0;
-                ctx.beginPath();
-                ctx.arc(
-                    this.x + (this.targetX - this.x) * 0.2,
-                    this.y + (this.targetY - this.y) * 0.2,
-                    2, 0, Math.PI * 2
-                );
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                
                 ctx.restore();
             }
             
-            takeDamage(amount) {
-                this.health -= amount;
-                return this.health <= 0;
+            attack(target) {
+                if (this.attackCooldown <= 0) {
+                    target.health -= this.damage;
+                    this.attackCooldown = 20;
+                    
+                    // Эффект попадания
+                    particles.push(new Particle(
+                        target.x, target.y,
+                        this.type === 'player' ? '#7aff7a' : '#ff4f4f'
+                    ));
+                    
+                    return true;
+                }
+                return false;
             }
         }
         
-        // Класс частиц (эффекты)
+        // Класс частиц
         class Particle {
             constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
-                this.vx = (Math.random() - 0.5) * 4;
-                this.vy = (Math.random() - 0.5) * 4;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
                 this.color = color;
                 this.life = 1;
-                this.size = Math.random() * 3 + 2;
+                this.size = Math.random() * 4 + 2;
             }
             
             update() {
@@ -529,126 +509,191 @@
             }
         }
         
-        // Инициализация игры
+        // Инициализация
         function initGame() {
             playerBases = [
-                new Base(200, 350, 'player'),
-                new Base(400, 200, 'player')
+                new Base(200, 400, 'player'),
+                new Base(200, 600, 'player')
             ];
             
             enemyBases = [
-                new Base(1000, 350, 'enemy'),
-                new Base(800, 500, 'enemy')
+                new Base(1200, 300, 'enemy'),
+                new Base(1200, 500, 'enemy'),
+                new Base(1200, 700, 'enemy')
             ];
             
             units = [];
             particles = [];
-            playerScore = 0;
-            enemyScore = 0;
-            waveNumber = 1;
+            frontLineX = canvas.width / 2;
         }
         
-        // Запуск игры
+        // Запуск
         window.startGame = function() {
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('gameUI').style.display = 'flex';
-            document.getElementById('controlPanel').style.display = 'flex';
             initGame();
             gameRunning = true;
             gameLoop();
         };
         
-        // Перезапуск
         window.restartGame = function() {
             document.getElementById('gameOverScreen').style.display = 'none';
             startGame();
         };
         
-        // Пауза
         window.togglePause = function() {
             paused = !paused;
             document.getElementById('pauseBtn').textContent = paused ? 'ПРОДОЛЖИТЬ' : 'ПАУЗА';
         };
         
-        // Создать юнита на базе
-        window.spawnUnitAtBase = function() {
-            if (!gameRunning || paused) return;
-            
-            for (let base of playerBases) {
-                if (base.units > 0) {
-                    const unit = base.spawnUnit();
-                    if (unit) {
-                        // Отправляем к вражеской базе
-                        if (enemyBases.length > 0) {
-                            const targetBase = enemyBases[0];
-                            unit.setTarget(targetBase.x, targetBase.y);
-                        }
-                        units.push(unit);
-                    }
-                    break;
-                }
-            }
-        };
-        
-        // Улучшить базу
-        window.upgradeBase = function() {
-            if (!gameRunning || paused) return;
-            
-            for (let base of playerBases) {
-                if (base.units >= 5) {
-                    base.units -= 5;
-                    base.level++;
-                    base.maxHealth += 50;
-                    base.health = base.maxHealth;
-                    base.maxUnits += 5;
-                    break;
-                }
-            }
-        };
-        
-        // Автоспавн
-        window.toggleAutoSpawn = function() {
-            autoSpawnEnabled = !autoSpawnEnabled;
-            const btn = document.querySelector('.controlBtn.active');
-            if (btn) {
-                btn.style.background = autoSpawnEnabled ? '#7aff7a' : 'transparent';
-                btn.style.color = autoSpawnEnabled ? '#1a2a1a' : '#7aff7a';
-            }
-        };
-        
-        // Обновление статистики
+        // Обновление UI
         function updateUI() {
-            document.getElementById('playerScore').textContent = playerBases.reduce((sum, b) => sum + b.units, 0) + units.filter(u => u.type === 'player').length;
-            document.getElementById('enemyScore').textContent = enemyBases.reduce((sum, b) => sum + b.units, 0) + units.filter(u => u.type === 'enemy').length;
-            document.getElementById('waveCounter').textContent = waveNumber;
+            const playerUnits = units.filter(u => u.type === 'player').length;
+            const playerBaseUnits = playerBases.reduce((sum, b) => sum + b.units, 0);
+            const enemyUnits = units.filter(u => u.type === 'enemy').length;
+            const enemyBaseUnits = enemyBases.reduce((sum, b) => sum + b.units, 0);
+            
+            document.getElementById('playerScore').textContent = playerUnits + playerBaseUnits;
+            document.getElementById('enemyScore').textContent = enemyUnits + enemyBaseUnits;
+            
+            // Позиция линии фронта в процентах
+            const frontPercent = Math.floor((frontLineX / canvas.width) * 100);
+            document.getElementById('frontLinePos').textContent = frontPercent + '%';
         }
         
-        // Спавн волны врагов (линией)
-        function spawnEnemyWave() {
+        // Спавн врагов
+        function spawnEnemies() {
             if (!gameRunning || paused) return;
             
-            // Увеличиваем сложность с каждой волной
-            waveNumber++;
-            const enemiesCount = 5 + waveNumber * 2;
+            for (let base of enemyBases) {
+                if (Math.random() < 0.02 && base.units > 0) {
+                    const unit = base.spawnUnit();
+                    if (unit) {
+                        // Цель - левая сторона
+                        unit.targetX = 100;
+                        unit.targetY = 200 + Math.random() * 400;
+                        units.push(unit);
+                    }
+                }
+            }
+        }
+        
+        // Обновление боя
+        function updateCombat() {
+            // Сбрасываем флаг боя
+            units.forEach(u => u.inCombat = false);
             
-            if (enemyBases.length > 0) {
-                const base = enemyBases[0];
-                
-                // Создаем врагов линией
-                for (let i = 0; i < enemiesCount; i++) {
-                    if (base.units > 0) {
-                        const unit = base.spawnUnit();
-                        if (unit) {
-                            // Располагаем их линией
-                            unit.x = base.x - 50 - i * 15;
-                            unit.y = base.y - 30 + (i % 3) * 30;
+            // Бой между юнитами
+            for (let i = 0; i < units.length; i++) {
+                for (let j = i + 1; j < units.length; j++) {
+                    const u1 = units[i];
+                    const u2 = units[j];
+                    
+                    if (u1.type !== u2.type) {
+                        const dx = u1.x - u2.x;
+                        const dy = u1.y - u2.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        
+                        if (dist < u1.attackRange + u2.attackRange) {
+                            // Отмечаем что юниты в бою
+                            u1.inCombat = true;
+                            u2.inCombat = true;
                             
-                            // Атакуют ближайшую базу игрока
-                            if (playerBases.length > 0) {
-                                const targetBase = playerBases[Math.floor(Math.random() * playerBases.length)];
-                                unit.setTarget(targetBase.x, targetBase.y);
+                            // Атака
+                            if (u1.attackCooldown <= 0) {
+                                u1.attack(u2);
                             }
-                            units.push(unit);
+                            if (u2.attackCooldown <= 0) {
+                                u2.attack(u1);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Удаление мертвых юнитов
+            units = units.filter(u => {
+                if (u.health <= 0) {
+                    // Взрыв
+                    for (let p = 0; p < 5; p++) {
+                        particles.push(new Particle(
+                            u.x, u.y,
+                            u.type === 'player' ? '#7aff7a' : '#ff4f4f'
+                        ));
+                    }
+                    return false;
+                }
+                return true;
+            });
+        }
+        
+        // Обновление линии фронта
+        function updateFrontLine() {
+            if (units.length === 0) return;
+            
+            // Находим среднюю позицию врагов и игроков
+            let playerX = 0;
+            let playerCount = 0;
+            let enemyX = 0;
+            let enemyCount = 0;
+            
+            units.forEach(u => {
+                if (u.type === 'player') {
+                    playerX += u.x;
+                    playerCount++;
+                } else {
+                    enemyX += u.x;
+                    enemyCount++;
+                }
+            });
+            
+            if (playerCount > 0 && enemyCount > 0) {
+                playerX /= playerCount;
+                enemyX /= enemyCount;
+                
+                // Линия фронта посередине между армиями
+                frontLineX = (playerX + enemyX) / 2;
+            }
+        }
+        
+        // Атака баз
+        function attackBases() {
+            // Враги атакуют базы игрока
+            for (let i = units.length - 1; i >= 0; i--) {
+                const unit = units[i];
+                
+                if (unit.type === 'enemy') {
+                    for (let base of playerBases) {
+                        const dx = unit.x - base.x;
+                        const dy = unit.y - base.y;
+                        if (Math.sqrt(dx*dx + dy*dy) < 50) {
+                            base.health -= unit.damage;
+                            units.splice(i, 1);
+                            
+                            if (base.health <= 0) {
+                                playerBases = playerBases.filter(b => b !== base);
+                                for (let p = 0; p < 20; p++) {
+                                    particles.push(new Particle(base.x, base.y, '#ff4f4f'));
+                                }
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    for (let base of enemyBases) {
+                        const dx = unit.x - base.x;
+                        const dy = unit.y - base.y;
+                        if (Math.sqrt(dx*dx + dy*dy) < 50) {
+                            base.health -= unit.damage;
+                            units.splice(i, 1);
+                            
+                            if (base.health <= 0) {
+                                enemyBases = enemyBases.filter(b => b !== base);
+                                for (let p = 0; p < 20; p++) {
+                                    particles.push(new Particle(base.x, base.y, '#7aff7a'));
+                                }
+                            }
+                            break;
                         }
                     }
                 }
@@ -662,99 +707,27 @@
             if (!paused) {
                 // Обновление
                 [...playerBases, ...enemyBases].forEach(base => base.update());
-                
-                // Автоспавн врагов
-                if (autoSpawnEnabled && Math.random() < 0.01) {
-                    spawnEnemyWave();
-                }
-                
-                // Движение юнитов
                 units.forEach(unit => unit.update());
                 
-                // Проверка коллизий (бой)
-                for (let i = units.length - 1; i >= 0; i--) {
-                    const unit = units[i];
-                    
-                    // Атака баз
-                    if (unit.type === 'enemy') {
-                        for (let base of playerBases) {
-                            const dx = unit.x - base.x;
-                            const dy = unit.y - base.y;
-                            if (Math.sqrt(dx*dx + dy*dy) < 40) {
-                                // Враг атакует базу
-                                const died = base.takeDamage(unit.damage);
-                                units.splice(i, 1);
-                                
-                                if (died) {
-                                    // База уничтожена
-                                    playerBases = playerBases.filter(b => b !== base);
-                                    for (let p = 0; p < 10; p++) {
-                                        particles.push(new Particle(base.x, base.y, '#ff4f4f'));
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    } else {
-                        for (let base of enemyBases) {
-                            const dx = unit.x - base.x;
-                            const dy = unit.y - base.y;
-                            if (Math.sqrt(dx*dx + dy*dy) < 40) {
-                                // Игрок атакует вражескую базу
-                                const died = base.takeDamage(unit.damage);
-                                units.splice(i, 1);
-                                
-                                if (died) {
-                                    // База уничтожена
-                                    enemyBases = enemyBases.filter(b => b !== base);
-                                    for (let p = 0; p < 10; p++) {
-                                        particles.push(new Particle(base.x, base.y, '#7aff7a'));
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Бой между юнитами
-                    for (let j = i - 1; j >= 0; j--) {
-                        const unit2 = units[j];
-                        if (unit.type !== unit2.type) {
-                            const dx = unit.x - unit2.x;
-                            const dy = unit.y - unit2.y;
-                            if (Math.sqrt(dx*dx + dy*dy) < unit.radius + unit2.radius) {
-                                // Бой
-                                unit.health -= unit2.damage;
-                                unit2.health -= unit.damage;
-                                
-                                if (unit.health <= 0) {
-                                    units.splice(i, 1);
-                                    particles.push(new Particle(unit.x, unit.y, unit.type === 'player' ? '#7aff7a' : '#ff4f4f'));
-                                }
-                                if (unit2.health <= 0) {
-                                    units.splice(j, 1);
-                                    particles.push(new Particle(unit2.x, unit2.y, unit2.type === 'player' ? '#7aff7a' : '#ff4f4f'));
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
+                // Спавн врагов
+                spawnEnemies();
                 
-                // Обновление частиц
+                // Бой
+                updateCombat();
+                
+                // Атака баз
+                attackBases();
+                
+                // Линия фронта
+                updateFrontLine();
+                
+                // Частицы
                 particles = particles.filter(p => !p.update());
                 
                 // Проверка поражения
                 if (playerBases.length === 0) {
                     gameRunning = false;
-                    document.getElementById('finalWave').textContent = waveNumber;
                     document.getElementById('gameOverScreen').style.display = 'block';
-                }
-                
-                // Проверка победы
-                if (enemyBases.length === 0) {
-                    // Новая волна
-                    spawnEnemyWave();
                 }
                 
                 updateUI();
@@ -763,12 +736,12 @@
             // Отрисовка
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Рисуем "поляну" (траву)
+            // Фон (поляна)
             ctx.fillStyle = '#1a2a1a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Сетка (для военного стиля)
-            ctx.strokeStyle = '#3a4a3a';
+            // Сетка
+            ctx.strokeStyle = '#2a3a2a';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 50) {
                 ctx.beginPath();
@@ -781,23 +754,41 @@
                 ctx.beginPath();
                 ctx.moveTo(0, i);
                 ctx.lineTo(canvas.width, i);
-                ctx.strokeStyle = '#2a3a2a';
                 ctx.stroke();
             }
             
-            // Рисуем базы
+            // ЛИНИЯ ФРОНТА (основная фишка!)
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(frontLineX, 0);
+            ctx.lineTo(frontLineX, canvas.height);
+            ctx.strokeStyle = '#ff4f4f';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([20, 20]);
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+            
+            // Подпись линии
+            ctx.shadowBlur = 0;
+            ctx.font = 'bold 20px "Courier New"';
+            ctx.fillStyle = '#ff4f4f';
+            ctx.fillText('ЛИНИЯ ФРОНТА', frontLineX - 100, 50);
+            ctx.restore();
+            
+            // Базы
             [...playerBases, ...enemyBases].forEach(base => base.draw());
             
-            // Рисуем юнитов
+            // Юниты
             units.forEach(unit => unit.draw());
             
-            // Рисуем частицы
+            // Частицы
             particles.forEach(p => p.draw());
             
             requestAnimationFrame(gameLoop);
         }
         
-        // Обработка кликов мыши
+        // Обработка кликов
         canvas.addEventListener('mousedown', (e) => {
             if (!gameRunning || paused) return;
             
@@ -809,26 +800,26 @@
             const mouseY = (e.clientY - rect.top) * scaleY;
             
             if (e.button === 0) { // ЛКМ
-                // Проверяем клик по базе игрока
+                // Проверка баз
                 for (let base of playerBases) {
                     const dx = mouseX - base.x;
                     const dy = mouseY - base.y;
-                    if (Math.sqrt(dx*dx + dy*dy) < 30) {
+                    if (Math.sqrt(dx*dx + dy*dy) < base.radius) {
                         if (base.units > 0) {
-                            const unit = base.spawnUnit();
-                            if (unit) {
-                                // Отправляем к врагу
-                                if (enemyBases.length > 0) {
-                                    unit.setTarget(enemyBases[0].x, enemyBases[0].y);
+                            for (let i = 0; i < 3; i++) {
+                                const unit = base.spawnUnit();
+                                if (unit) {
+                                    unit.targetX = canvas.width - 200;
+                                    unit.targetY = 200 + Math.random() * 400;
+                                    units.push(unit);
                                 }
-                                units.push(unit);
                             }
                         }
                         return;
                     }
                 }
                 
-                // Проверка клика по юнитам
+                // Выделение юнитов
                 let clickedUnit = null;
                 for (let unit of units) {
                     if (unit.type === 'player') {
@@ -842,27 +833,22 @@
                 }
                 
                 if (clickedUnit) {
-                    // Выделяем юнита
                     if (!e.shiftKey) {
                         units.forEach(u => u.isSelected = false);
                     }
                     clickedUnit.isSelected = !clickedUnit.isSelected;
                 } else {
-                    // Отправляем выделенных юнитов
-                    const selectedUnits = units.filter(u => u.isSelected);
-                    if (selectedUnits.length > 0) {
-                        selectedUnits.forEach(unit => {
-                            unit.setTarget(mouseX, mouseY);
-                        });
-                    }
+                    // Отправка выделенных
+                    const selected = units.filter(u => u.isSelected);
+                    selected.forEach(unit => {
+                        unit.setTarget(mouseX, mouseY);
+                    });
                 }
             }
         });
         
-        // Запрет контекстного меню
         canvas.addEventListener('contextmenu', (e) => e.preventDefault());
         
-        // Запуск
         initGame();
     </script>
 </body>
