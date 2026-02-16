@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Война Тысячи Тысяч — Линия Фронта</title>
+    <title>Война Тысячи Тысяч — Черная Линия</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
         
         body {
-            background: linear-gradient(145deg, #0a0f0a 0%, #1a2f1a 100%);
+            background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,15 +22,15 @@
         
         #gameWrapper {
             position: relative;
-            box-shadow: 0 0 30px rgba(255, 100, 100, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
             border-radius: 20px;
             overflow: hidden;
-            border: 3px solid #5a3a3a;
+            border: 3px solid #8b0000;
         }
         
         canvas {
             display: block;
-            background: #2a3a2a;
+            background: #1e3a1e;
             cursor: crosshair;
         }
         
@@ -41,31 +41,31 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 20, 10, 0.95);
+            background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            border: 3px solid #7a5a5a;
+            border: 3px solid #8b0000;
             border-radius: 20px;
         }
         
         #mainMenu h1 {
-            color: #ff7a7a;
+            color: #ff0000;
             font-size: 64px;
-            text-shadow: 0 0 20px #ff0000;
+            text-shadow: 0 0 30px #8b0000;
             margin-bottom: 20px;
             letter-spacing: 4px;
             font-family: 'Courier New', monospace;
-            border-right: 4px solid #ff7a7a;
+            border-right: 4px solid #ff0000;
             padding-right: 10px;
             animation: blink 1s infinite;
         }
         
         @keyframes blink {
-            0%, 100% { border-color: #ff7a7a; }
+            0%, 100% { border-color: #ff0000; }
             50% { border-color: transparent; }
         }
         
@@ -77,8 +77,8 @@
         
         .menuBtn {
             background: transparent;
-            color: #ff7a7a;
-            border: 2px solid #ff7a7a;
+            color: #ff0000;
+            border: 2px solid #ff0000;
             padding: 15px 40px;
             font-size: 24px;
             font-family: 'Courier New', monospace;
@@ -87,13 +87,13 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 0 10px rgba(255, 122, 122, 0.3);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
         
         .menuBtn:hover {
-            background: #ff7a7a;
-            color: #0a1a0a;
-            box-shadow: 0 0 30px #ff7a7a;
+            background: #ff0000;
+            color: #000000;
+            box-shadow: 0 0 50px #ff0000;
             transform: scale(1.1);
         }
         
@@ -105,13 +105,13 @@
             right: 10px;
             display: flex;
             justify-content: space-between;
-            color: #ff7a7a;
+            color: #ff0000;
             font-size: 20px;
-            text-shadow: 0 0 10px #ff0000;
-            background: rgba(30, 20, 20, 0.7);
+            text-shadow: 0 0 10px #8b0000;
+            background: rgba(0, 0, 0, 0.7);
             padding: 15px 25px;
             border-radius: 50px;
-            border: 2px solid #7a5a5a;
+            border: 2px solid #8b0000;
             backdrop-filter: blur(5px);
             z-index: 5;
             font-family: 'Courier New', monospace;
@@ -135,13 +135,13 @@
             display: inline-block;
         }
         
-        .dot.green { background: #7aff7a; box-shadow: 0 0 15px #00ff00; }
-        .dot.red { background: #ff4f4f; box-shadow: 0 0 15px #ff0000; }
+        .dot.green { background: #00ff00; box-shadow: 0 0 15px #00ff00; }
+        .dot.red { background: #ff0000; box-shadow: 0 0 15px #ff0000; }
         
         #pauseBtn {
             background: transparent;
-            color: #ff7a7a;
-            border: 2px solid #ff7a7a;
+            color: #ff0000;
+            border: 2px solid #ff0000;
             padding: 5px 20px;
             font-family: 'Courier New', monospace;
             font-size: 18px;
@@ -151,41 +151,8 @@
         }
         
         #pauseBtn:hover {
-            background: #ff7a7a;
-            color: #1a1a1a;
-        }
-        
-        /* Панель управления */
-        #controlPanel {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 20, 20, 0.9);
-            border: 2px solid #7a5a5a;
-            border-radius: 50px;
-            padding: 10px 20px;
-            display: flex;
-            gap: 15px;
-            backdrop-filter: blur(5px);
-            z-index: 5;
-        }
-        
-        .controlBtn {
-            background: transparent;
-            color: #ff7a7a;
-            border: 1px solid #ff7a7a;
-            padding: 8px 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 30px;
-        }
-        
-        .controlBtn:hover {
-            background: #ff7a7a;
-            color: #1a1a1a;
+            background: #ff0000;
+            color: #000000;
         }
         
         /* Экран поражения */
@@ -194,12 +161,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(30, 10, 10, 0.95);
-            border: 3px solid #ff4f4f;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #ff0000;
             border-radius: 20px;
             padding: 40px;
             text-align: center;
-            color: #ff4f4f;
+            color: #ff0000;
             z-index: 20;
             display: none;
             backdrop-filter: blur(5px);
@@ -218,14 +185,14 @@
         
         <!-- Главное меню -->
         <div id="mainMenu">
-            <h1>ЛИНИЯ ФРОНТА</h1>
-            <div style="color: #ff7a7a; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ УДЕРЖИ ЛИНИЮ ОБОРОНЫ ⚔️</p>
-                <p style="font-size: 16px; margin-top: 10px;">Кликай по базам чтобы создать юнитов</p>
-                <p style="font-size: 14px; color: #ff9a9a;">Красная линия — фронт</p>
+            <h1>ЧЕРНАЯ ЛИНИЯ</h1>
+            <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
+                <p>⚔️ ЧЕРНАЯ ПОЛОСА ВПЕРЕДИ ВРАГОВ ⚔️</p>
+                <p style="font-size: 16px; margin-top: 10px;">Она показывает продвижение армии</p>
+                <p style="font-size: 14px; color: #ff6666;">Останови черную линию!</p>
             </div>
             <div class="menuButtons">
-                <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
+                <button class="menuBtn" onclick="startGame()">ВСТУПИТЬ В БОЙ</button>
                 <button class="menuBtn" onclick="location.reload()">ВЫХОД</button>
             </div>
         </div>
@@ -242,8 +209,8 @@
                     <span id="enemyScore">0</span>
                 </div>
                 <div class="statItem">
-                    <span>📊</span>
-                    <span id="frontLinePos">50%</span>
+                    <span>⚫</span>
+                    <span id="blackLinePos">100%</span>
                 </div>
             </div>
             <button id="pauseBtn" onclick="togglePause()">ПАУЗА</button>
@@ -251,8 +218,8 @@
         
         <!-- Экран поражения -->
         <div id="gameOverScreen">
-            <h2>ЛИНИЯ ПРОРВАНА</h2>
-            <p style="font-size: 24px; margin: 20px 0;">Вы погибли в бою</p>
+            <h2>ЧЕРНАЯ ЛИНИЯ ДОШЛА</h2>
+            <p style="font-size: 24px; margin: 20px 0;">Вы не остановили наступление</p>
             <button class="menuBtn" onclick="restartGame()">НАЧАТЬ СНАЧАЛА</button>
         </div>
     </div>
@@ -272,7 +239,9 @@
         // Статистика
         let playerScore = 0;
         let enemyScore = 0;
-        let frontLineX = canvas.width / 2; // Линия фронта
+        
+        // Черная линия (линия фронта) - начинается справа и двигается влево
+        let blackLineX = canvas.width - 100; // Начальная позиция - перед врагами
         
         // Класс базы
         class Base {
@@ -280,11 +249,11 @@
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.health = 200;
-                this.maxHealth = 200;
-                this.units = type === 'player' ? 10 : 15;
-                this.maxUnits = 20;
-                this.spawnRate = 0.03;
+                this.health = 250;
+                this.maxHealth = 250;
+                this.units = type === 'player' ? 12 : 20;
+                this.maxUnits = 25;
+                this.spawnRate = 0.04;
                 this.spawnProgress = 0;
                 this.radius = 35;
                 this.pulsePhase = Math.random() * Math.PI * 2;
@@ -317,7 +286,7 @@
                 ctx.save();
                 
                 // Пульсация
-                ctx.shadowColor = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
+                ctx.shadowColor = this.type === 'player' ? '#00ff00' : '#ff0000';
                 ctx.shadowBlur = 30 + Math.sin(this.pulsePhase) * 10;
                 
                 // База
@@ -326,11 +295,11 @@
                 
                 const gradient = ctx.createRadialGradient(this.x - 10, this.y - 10, 5, this.x, this.y, 45);
                 if (this.type === 'player') {
-                    gradient.addColorStop(0, '#7aff7a');
-                    gradient.addColorStop(1, '#2a5a2a');
+                    gradient.addColorStop(0, '#00ff00');
+                    gradient.addColorStop(1, '#006400');
                 } else {
-                    gradient.addColorStop(0, '#ff4f4f');
-                    gradient.addColorStop(1, '#5a2a2a');
+                    gradient.addColorStop(0, '#ff0000');
+                    gradient.addColorStop(1, '#8b0000');
                 }
                 
                 ctx.fillStyle = gradient;
@@ -351,7 +320,7 @@
                 ctx.fillStyle = '#333';
                 ctx.fillRect(this.x - 30, this.y - 50, 60, 8);
                 const healthPercent = this.health / this.maxHealth;
-                ctx.fillStyle = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
+                ctx.fillStyle = this.type === 'player' ? '#00ff00' : '#ff0000';
                 ctx.fillRect(this.x - 30, this.y - 50, 60 * healthPercent, 8);
                 
                 ctx.restore();
@@ -369,19 +338,20 @@
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.targetX = type === 'player' ? canvas.width - 100 : 100;
+                this.targetX = type === 'player' ? canvas.width - 200 : 100;
                 this.targetY = y;
-                this.speed = type === 'player' ? 2 : 2.2;
-                this.health = 50;
-                this.maxHealth = 50;
-                this.damage = 7;
+                this.speed = type === 'player' ? 2.2 : 2.5;
+                this.health = 60;
+                this.maxHealth = 60;
+                this.damage = 8;
                 this.attackCooldown = 0;
-                this.attackRange = 25;
-                this.radius = 10;
+                this.attackRange = 30;
+                this.radius = 12;
                 this.isSelected = false;
                 
                 // Для построения в линию
                 this.inCombat = false;
+                this.formationOffset = (Math.random() - 0.5) * 30;
             }
             
             setTarget(tx, ty) {
@@ -417,22 +387,22 @@
                 // Здоровье
                 const healthPercent = this.health / this.maxHealth;
                 
-                // Цвет в зависимости от здоровья
-                let color;
+                // Цвет
                 if (this.type === 'player') {
-                    color = `rgb(${Math.floor(100 + 155 * (1 - healthPercent))}, 255, ${Math.floor(100 + 155 * (1 - healthPercent))})`;
+                    ctx.fillStyle = '#00ff00';
                 } else {
-                    color = `rgb(255, ${Math.floor(100 + 155 * (1 - healthPercent))}, ${Math.floor(100 + 155 * (1 - healthPercent))})`;
+                    // Враги красные, но с затемнением в зависимости от здоровья
+                    const darkness = 0.5 + (1 - healthPercent) * 0.5;
+                    ctx.fillStyle = `rgb(255, ${Math.floor(100 * darkness)}, ${Math.floor(100 * darkness)})`;
                 }
                 
                 // Тень
-                ctx.shadowColor = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
+                ctx.shadowColor = this.type === 'player' ? '#00ff00' : '#ff0000';
                 ctx.shadowBlur = 15;
                 
                 // Юнит
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = color;
                 ctx.fill();
                 
                 // Обводка
@@ -443,21 +413,19 @@
                 // Полоска здоровья
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = '#333';
-                ctx.fillRect(this.x - 12, this.y - 18, 24, 4);
-                ctx.fillStyle = this.type === 'player' ? '#7aff7a' : '#ff4f4f';
-                ctx.fillRect(this.x - 12, this.y - 18, 24 * healthPercent, 4);
+                ctx.fillRect(this.x - 12, this.y - 20, 24, 4);
+                ctx.fillStyle = this.type === 'player' ? '#00ff00' : '#ff0000';
+                ctx.fillRect(this.x - 12, this.y - 20, 24 * healthPercent, 4);
                 
-                // Красная линия впереди для врагов
-                if (this.type === 'enemy' && !this.inCombat) {
-                    ctx.beginPath();
-                    ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(this.targetX, this.y);
-                    ctx.strokeStyle = '#ff4f4f';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                }
+                // Глазок направления
+                ctx.beginPath();
+                ctx.arc(
+                    this.x + (this.targetX - this.x) * 0.2,
+                    this.y,
+                    2, 0, Math.PI * 2
+                );
+                ctx.fillStyle = 'white';
+                ctx.fill();
                 
                 ctx.restore();
             }
@@ -465,12 +433,12 @@
             attack(target) {
                 if (this.attackCooldown <= 0) {
                     target.health -= this.damage;
-                    this.attackCooldown = 20;
+                    this.attackCooldown = 15;
                     
                     // Эффект попадания
                     particles.push(new Particle(
                         target.x, target.y,
-                        this.type === 'player' ? '#7aff7a' : '#ff4f4f'
+                        this.type === 'player' ? '#00ff00' : '#ff0000'
                     ));
                     
                     return true;
@@ -484,17 +452,17 @@
             constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
-                this.vx = (Math.random() - 0.5) * 8;
-                this.vy = (Math.random() - 0.5) * 8;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
                 this.color = color;
                 this.life = 1;
-                this.size = Math.random() * 4 + 2;
+                this.size = Math.random() * 5 + 3;
             }
             
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.life -= 0.02;
+                this.life -= 0.03;
                 return this.life <= 0;
             }
             
@@ -512,19 +480,20 @@
         // Инициализация
         function initGame() {
             playerBases = [
-                new Base(200, 400, 'player'),
-                new Base(200, 600, 'player')
+                new Base(150, 300, 'player'),
+                new Base(150, 500, 'player'),
+                new Base(150, 700, 'player')
             ];
             
             enemyBases = [
-                new Base(1200, 300, 'enemy'),
-                new Base(1200, 500, 'enemy'),
-                new Base(1200, 700, 'enemy')
+                new Base(1250, 250, 'enemy'),
+                new Base(1250, 450, 'enemy'),
+                new Base(1250, 650, 'enemy')
             ];
             
             units = [];
             particles = [];
-            frontLineX = canvas.width / 2;
+            blackLineX = canvas.width - 150; // Черная линия перед врагами
         }
         
         // Запуск
@@ -556,9 +525,9 @@
             document.getElementById('playerScore').textContent = playerUnits + playerBaseUnits;
             document.getElementById('enemyScore').textContent = enemyUnits + enemyBaseUnits;
             
-            // Позиция линии фронта в процентах
-            const frontPercent = Math.floor((frontLineX / canvas.width) * 100);
-            document.getElementById('frontLinePos').textContent = frontPercent + '%';
+            // Позиция черной линии (чем меньше %, тем ближе враги)
+            const linePercent = Math.floor((blackLineX / canvas.width) * 100);
+            document.getElementById('blackLinePos').textContent = linePercent + '%';
         }
         
         // Спавн врагов
@@ -566,11 +535,11 @@
             if (!gameRunning || paused) return;
             
             for (let base of enemyBases) {
-                if (Math.random() < 0.02 && base.units > 0) {
+                if (Math.random() < 0.03 && base.units > 0) {
                     const unit = base.spawnUnit();
                     if (unit) {
-                        // Цель - левая сторона
-                        unit.targetX = 100;
+                        // Цель - левая сторона (игроки)
+                        unit.targetX = 200 + Math.random() * 200;
                         unit.targetY = 200 + Math.random() * 400;
                         units.push(unit);
                     }
@@ -595,11 +564,9 @@
                         const dist = Math.sqrt(dx*dx + dy*dy);
                         
                         if (dist < u1.attackRange + u2.attackRange) {
-                            // Отмечаем что юниты в бою
                             u1.inCombat = true;
                             u2.inCombat = true;
                             
-                            // Атака
                             if (u1.attackCooldown <= 0) {
                                 u1.attack(u2);
                             }
@@ -611,14 +578,13 @@
                 }
             }
             
-            // Удаление мертвых юнитов
+            // Удаление мертвых
             units = units.filter(u => {
                 if (u.health <= 0) {
-                    // Взрыв
-                    for (let p = 0; p < 5; p++) {
+                    for (let p = 0; p < 8; p++) {
                         particles.push(new Particle(
                             u.x, u.y,
-                            u.type === 'player' ? '#7aff7a' : '#ff4f4f'
+                            u.type === 'player' ? '#00ff00' : '#ff0000'
                         ));
                     }
                     return false;
@@ -627,33 +593,45 @@
             });
         }
         
-        // Обновление линии фронта
-        function updateFrontLine() {
-            if (units.length === 0) return;
-            
-            // Находим среднюю позицию врагов и игроков
-            let playerX = 0;
-            let playerCount = 0;
-            let enemyX = 0;
+        // Обновление черной линии
+        function updateBlackLine() {
+            // Находим самого продвинутого врага (самый левый)
+            let mostAdvancedEnemy = canvas.width;
             let enemyCount = 0;
             
             units.forEach(u => {
-                if (u.type === 'player') {
-                    playerX += u.x;
-                    playerCount++;
-                } else {
-                    enemyX += u.x;
+                if (u.type === 'enemy') {
+                    if (u.x < mostAdvancedEnemy) {
+                        mostAdvancedEnemy = u.x;
+                    }
                     enemyCount++;
                 }
             });
             
-            if (playerCount > 0 && enemyCount > 0) {
-                playerX /= playerCount;
-                enemyX /= enemyCount;
+            // Находим самого продвинутого игрока (самый правый)
+            let mostAdvancedPlayer = 0;
+            units.forEach(u => {
+                if (u.type === 'player') {
+                    if (u.x > mostAdvancedPlayer) {
+                        mostAdvancedPlayer = u.x;
+                    }
+                }
+            });
+            
+            // Если есть враги, черная линия перед самым продвинутым врагом
+            if (enemyCount > 0) {
+                // Черная линия на 50 пикселей впереди самого продвинутого врага
+                const targetLine = mostAdvancedEnemy - 50;
                 
-                // Линия фронта посередине между армиями
-                frontLineX = (playerX + enemyX) / 2;
+                // Плавно двигаем линию
+                blackLineX += (targetLine - blackLineX) * 0.05;
+            } else {
+                // Если врагов нет, линия отодвигается назад
+                blackLineX += (canvas.width - 100 - blackLineX) * 0.05;
             }
+            
+            // Линия не может быть левее 50 (слишком близко к базе игрока)
+            blackLineX = Math.max(100, Math.min(canvas.width - 50, blackLineX));
         }
         
         // Атака баз
@@ -666,14 +644,14 @@
                     for (let base of playerBases) {
                         const dx = unit.x - base.x;
                         const dy = unit.y - base.y;
-                        if (Math.sqrt(dx*dx + dy*dy) < 50) {
+                        if (Math.sqrt(dx*dx + dy*dy) < 60) {
                             base.health -= unit.damage;
                             units.splice(i, 1);
                             
                             if (base.health <= 0) {
                                 playerBases = playerBases.filter(b => b !== base);
-                                for (let p = 0; p < 20; p++) {
-                                    particles.push(new Particle(base.x, base.y, '#ff4f4f'));
+                                for (let p = 0; p < 30; p++) {
+                                    particles.push(new Particle(base.x, base.y, '#ff0000'));
                                 }
                             }
                             break;
@@ -683,14 +661,14 @@
                     for (let base of enemyBases) {
                         const dx = unit.x - base.x;
                         const dy = unit.y - base.y;
-                        if (Math.sqrt(dx*dx + dy*dy) < 50) {
+                        if (Math.sqrt(dx*dx + dy*dy) < 60) {
                             base.health -= unit.damage;
                             units.splice(i, 1);
                             
                             if (base.health <= 0) {
                                 enemyBases = enemyBases.filter(b => b !== base);
-                                for (let p = 0; p < 20; p++) {
-                                    particles.push(new Particle(base.x, base.y, '#7aff7a'));
+                                for (let p = 0; p < 30; p++) {
+                                    particles.push(new Particle(base.x, base.y, '#00ff00'));
                                 }
                             }
                             break;
@@ -718,14 +696,14 @@
                 // Атака баз
                 attackBases();
                 
-                // Линия фронта
-                updateFrontLine();
+                // Обновление черной линии (самое важное!)
+                updateBlackLine();
                 
                 // Частицы
                 particles = particles.filter(p => !p.update());
                 
-                // Проверка поражения
-                if (playerBases.length === 0) {
+                // Проверка поражения (черная линия дошла до баз игрока)
+                if (blackLineX < 150) {
                     gameRunning = false;
                     document.getElementById('gameOverScreen').style.display = 'block';
                 }
@@ -736,18 +714,17 @@
             // Отрисовка
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Фон (поляна)
-            ctx.fillStyle = '#1a2a1a';
+            // Фон (поля битвы)
+            ctx.fillStyle = '#1e3a1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Сетка
-            ctx.strokeStyle = '#2a3a2a';
+            // Военная сетка
+            ctx.strokeStyle = '#2a4a2a';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 50) {
                 ctx.beginPath();
                 ctx.moveTo(i, 0);
                 ctx.lineTo(i, canvas.height);
-                ctx.strokeStyle = '#2a3a2a';
                 ctx.stroke();
             }
             for (let i = 0; i < canvas.height; i += 50) {
@@ -757,23 +734,40 @@
                 ctx.stroke();
             }
             
-            // ЛИНИЯ ФРОНТА (основная фишка!)
+            // *** ЧЕРНАЯ ЛИНИЯ ФРОНТА (самое главное!) ***
             ctx.save();
+            
+            // Жирная черная линия впереди врагов
             ctx.beginPath();
-            ctx.moveTo(frontLineX, 0);
-            ctx.lineTo(frontLineX, canvas.height);
-            ctx.strokeStyle = '#ff4f4f';
-            ctx.lineWidth = 4;
-            ctx.setLineDash([20, 20]);
-            ctx.shadowColor = '#ff0000';
+            ctx.moveTo(blackLineX, 0);
+            ctx.lineTo(blackLineX, canvas.height);
+            
+            // Толстая черная линия
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 8;
+            ctx.shadowColor = '#000000';
             ctx.shadowBlur = 20;
             ctx.stroke();
             
-            // Подпись линии
+            // Белая окантовка для контраста
+            ctx.beginPath();
+            ctx.moveTo(blackLineX, 0);
+            ctx.lineTo(blackLineX, canvas.height);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
             ctx.shadowBlur = 0;
-            ctx.font = 'bold 20px "Courier New"';
-            ctx.fillStyle = '#ff4f4f';
-            ctx.fillText('ЛИНИЯ ФРОНТА', frontLineX - 100, 50);
+            ctx.stroke();
+            
+            // Эффект свечения
+            ctx.beginPath();
+            ctx.moveTo(blackLineX, 0);
+            ctx.lineTo(blackLineX, canvas.height);
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 1;
+            ctx.shadowColor = '#ff0000';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            
             ctx.restore();
             
             // Базы
@@ -806,11 +800,12 @@
                     const dy = mouseY - base.y;
                     if (Math.sqrt(dx*dx + dy*dy) < base.radius) {
                         if (base.units > 0) {
-                            for (let i = 0; i < 3; i++) {
+                            // Создаем 2 юнита за клик
+                            for (let i = 0; i < 2; i++) {
                                 const unit = base.spawnUnit();
                                 if (unit) {
-                                    unit.targetX = canvas.width - 200;
-                                    unit.targetY = 200 + Math.random() * 400;
+                                    unit.targetX = canvas.width - 300;
+                                    unit.targetY = 200 + Math.random() * 500;
                                     units.push(unit);
                                 }
                             }
