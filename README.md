@@ -188,9 +188,9 @@
         <div id="mainMenu">
             <h1>ЛИНИЯ ФРОНТА</h1>
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
-                <p>⚔️ ЖЕЛТЫЕ ТОЧКИ = БАЗЫ ⚔️</p>
-                <p style="font-size: 16px; margin-top: 10px;">Из них по КД выходят юниты</p>
-                <p style="font-size: 14px; color: #ff6666;">Зеленые слева, Красные справа</p>
+                <p>⚔️ УПРАВЛЕНИЕ ЮНИТАМИ ⚔️</p>
+                <p style="font-size: 16px; margin-top: 10px;">ЛКМ - выделить / отдать приказ</p>
+                <p style="font-size: 14px; color: #ff6666;">Зажми ЛКМ чтобы выделить несколько</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
@@ -237,7 +237,14 @@
         let units = [];
         let particles = [];
         let lastSpawnTime = 0;
-        const SPAWN_COOLDOWN = 2000; // 2 секунды
+        const SPAWN_COOLDOWN = 2000;
+        
+        // Для выделения
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let endX = 0;
+        let endY = 0;
         
         // Статистика
         let playerScore = 0;
@@ -291,13 +298,13 @@
             }
         }
         
-        // Класс юнита - МЕДЛЕННЫЕ
+        // Класс юнита
         class Unit {
             constructor(x, y, type) {
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.speed = 0.5;
+                this.speed = 0.8;
                 this.health = 100;
                 this.maxHealth = 100;
                 this.damage = 15;
@@ -306,6 +313,28 @@
                 this.radius = 10;
                 this.isSelected = false;
                 this.inCombat = false;
+                this.targetX = null;
+                this.targetY = null;
+                this.hasOrder = false;
+            }
+            
+            setTarget(tx, ty) {
+                // Нельзя отдавать приказ за линию
+                if (this.type === 'player' && tx < this.getLineXAtY(ty)) {
+                    tx = this.getLineXAtY(ty) + 5;
+                }
+                this.targetX = tx;
+                this.targetY = ty;
+                this.hasOrder = true;
+            }
+            
+            getLineXAtY(y) {
+                for (let point of linePoints) {
+                    if (Math.abs(point.y - y) < 20) {
+                        return point.x;
+                    }
+                }
+                return linePoints[0].x;
             }
             
             update() {
@@ -313,32 +342,50 @@
                     this.attackCooldown--;
                 }
                 
-                // Находим ближайшую точку линии для этого юнита
-                let targetX = linePoints[0].x;
-                let minDist = Math.abs(linePoints[0].y - this.y);
+                // Получаем позицию линии на уровне этого юнита
+                let lineX = this.getLineXAtY(this.y);
                 
-                for (let point of linePoints) {
-                    const dist = Math.abs(point.y - this.y);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        targetX = point.x;
-                    }
-                }
-                
-                // Движение к линии
-                if (this.type === 'player') {
-                    // Игроки СПРАВА от линии, идут ВЛЕВО к линии
-                    if (this.x > targetX + 2) {
-                        this.x -= this.speed;
+                // Если есть приказ - двигаемся к цели
+                if (this.hasOrder && this.targetX !== null && this.targetY !== null) {
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (dist > 5) {
+                        let newX = this.x + (dx / dist) * this.speed;
+                        let newY = this.y + (dy / dist) * this.speed;
+                        
+                        // Проверяем, не перейдет ли юнит линию
+                        if (this.type === 'player' && newX < lineX) {
+                            this.x = lineX;
+                            this.hasOrder = false; // Приказ выполнен (дошел до линии)
+                        } else if (this.type === 'enemy' && newX > lineX) {
+                            this.x = lineX;
+                            this.hasOrder = false; // Приказ выполнен (дошел до линии)
+                        } else {
+                            this.x = newX;
+                            this.y = newY;
+                        }
+                    } else {
+                        this.hasOrder = false;
                     }
                 } else {
-                    // Враги СЛЕВА от линии, идут ВПРАВО к линии
-                    if (this.x < targetX - 2) {
-                        this.x += this.speed;
+                    // Нет приказа - идем к линии
+                    if (this.type === 'player') {
+                        // Игроки справа от линии, идут влево
+                        if (this.x > lineX + 2) {
+                            this.x -= this.speed;
+                            if (this.x < lineX) this.x = lineX;
+                        }
+                    } else {
+                        // Враги слева от линии, идут вправо
+                        if (this.x < lineX - 2) {
+                            this.x += this.speed;
+                            if (this.x > lineX) this.x = lineX;
+                        }
                     }
                 }
                 
-                // Ограничение по краям
                 this.x = Math.max(20, Math.min(canvas.width - 20, this.x));
                 this.y = Math.max(20, Math.min(canvas.height - 20, this.y));
             }
@@ -362,8 +409,20 @@
                 ctx.fill();
                 
                 ctx.strokeStyle = this.isSelected ? '#ffd700' : 'white';
-                ctx.lineWidth = this.isSelected ? 2 : 1;
+                ctx.lineWidth = this.isSelected ? 3 : 1;
                 ctx.stroke();
+                
+                // Рисуем линию к цели если есть приказ и юнит выделен
+                if (this.hasOrder && this.isSelected) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.targetX, this.targetY);
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
                 
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = '#333';
@@ -422,7 +481,6 @@
         
         // Инициализация
         function initGame() {
-            // Желтые базы
             playerBases = [
                 new Base(100, 200, 'player'),
                 new Base(100, 400, 'player'),
@@ -439,7 +497,6 @@
             particles = [];
             lastSpawnTime = Date.now();
             
-            // Линия посередине
             linePoints = [];
             for (let i = 0; i <= SEGMENTS; i++) {
                 linePoints.push({
@@ -483,7 +540,7 @@
             document.getElementById('blackLinePos').textContent = linePercent + '%';
         }
         
-        // Спавн юнитов по КД
+        // Спавн юнитов
         function spawnUnitsFromBases() {
             if (!gameRunning || paused) return;
             
@@ -492,13 +549,11 @@
             
             lastSpawnTime = currentTime;
             
-            // Спавним игроков из левых баз
             for (let base of playerBases) {
                 let unit = new Unit(base.x + 30, base.y + (Math.random() - 0.5) * 30, 'player');
                 units.push(unit);
             }
             
-            // Спавним врагов из правых баз
             for (let base of enemyBases) {
                 let unit = new Unit(base.x - 30, base.y + (Math.random() - 0.5) * 30, 'enemy');
                 units.push(unit);
@@ -548,38 +603,30 @@
             });
         }
         
-        // Механика линии - ИЗГИБАЕТСЯ
+        // Механика линии - ИЗГИБ ПРИ КАСАНИИ
         function updateLine() {
-            for (let i = 0; i <= SEGMENTS; i++) {
-                let pushForce = 0;
-                
-                // Считаем влияние юнитов на эту точку
-                for (let unit of units) {
+            for (let unit of units) {
+                for (let i = 0; i <= SEGMENTS; i++) {
                     const dy = Math.abs(unit.y - linePoints[i].y);
                     
-                    if (dy < 80) {
-                        const influence = (1 - dy / 80) * 3;
-                        
+                    if (dy < 20 && Math.abs(unit.x - linePoints[i].x) < 15) {
                         if (unit.type === 'player') {
-                            pushForce -= influence; // Игроки толкают влево
+                            linePoints[i].x -= 1.5;
                         } else {
-                            pushForce += influence; // Враги толкают вправо
+                            linePoints[i].x += 1.5;
                         }
+                        
+                        particles.push(new Particle(
+                            unit.x, unit.y,
+                            unit.type === 'player' ? '#00ff00' : '#ff0000'
+                        ));
                     }
-                }
-                
-                // Применяем силу к линии
-                linePoints[i].x += pushForce;
-                
-                // Плавность (сглаживание)
-                if (i > 0) {
-                    linePoints[i].x = (linePoints[i].x + linePoints[i-1].x) / 2;
                 }
             }
             
-            // Еще раз сглаживаем в обратном направлении
-            for (let i = SEGMENTS - 1; i >= 0; i--) {
-                linePoints[i].x = (linePoints[i].x + linePoints[i+1].x) / 2;
+            // Сглаживание
+            for (let i = 1; i < SEGMENTS; i++) {
+                linePoints[i].x = (linePoints[i].x + linePoints[i-1].x + linePoints[i+1].x) / 3;
             }
         }
         
@@ -648,6 +695,20 @@
             ctx.restore();
         }
         
+        // Отрисовка рамки выделения
+        function drawSelection() {
+            if (!isDragging) return;
+            
+            ctx.save();
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(startX, startY, endX - startX, endY - startY);
+            ctx.restore();
+        }
+        
         // Игровой цикл
         function gameLoop() {
             if (!gameRunning) return;
@@ -697,6 +758,7 @@
             }
             
             drawLine();
+            drawSelection();
             
             [...playerBases, ...enemyBases].forEach(base => base.draw());
             units.forEach(unit => unit.draw());
@@ -704,6 +766,110 @@
             
             requestAnimationFrame(gameLoop);
         }
+        
+        // Обработка мыши
+        canvas.addEventListener('mousedown', (e) => {
+            if (!gameRunning || paused) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+            
+            if (e.button === 0) {
+                isDragging = true;
+                startX = mouseX;
+                startY = mouseY;
+                endX = mouseX;
+                endY = mouseY;
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!gameRunning || paused || !isDragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            endX = (e.clientX - rect.left) * scaleX;
+            endY = (e.clientY - rect.top) * scaleY;
+        });
+        
+        canvas.addEventListener('mouseup', (e) => {
+            if (!gameRunning || paused) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+            
+            if (e.button === 0) {
+                if (isDragging) {
+                    if (Math.abs(endX - startX) > 5 || Math.abs(endY - startY) > 5) {
+                        // Снимаем выделение со всех
+                        units.forEach(u => u.isSelected = false);
+                        
+                        // Выделяем юниты в рамке
+                        const minX = Math.min(startX, endX);
+                        const maxX = Math.max(startX, endX);
+                        const minY = Math.min(startY, endY);
+                        const maxY = Math.max(startY, endY);
+                        
+                        units.forEach(unit => {
+                            if (unit.type === 'player' && 
+                                unit.x >= minX && unit.x <= maxX && 
+                                unit.y >= minY && unit.y <= maxY) {
+                                unit.isSelected = true;
+                            }
+                        });
+                    } else {
+                        // Клик по юниту
+                        let clickedUnit = null;
+                        for (let unit of units) {
+                            if (unit.type === 'player') {
+                                const dx = mouseX - unit.x;
+                                const dy = mouseY - unit.y;
+                                if (Math.sqrt(dx*dx + dy*dy) < unit.radius + 5) {
+                                    clickedUnit = unit;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (clickedUnit) {
+                            if (!e.shiftKey) {
+                                units.forEach(u => u.isSelected = false);
+                            }
+                            clickedUnit.isSelected = !clickedUnit.isSelected;
+                        } else {
+                            // Клик по пустому месту - отдаем приказ выделенным
+                            const selected = units.filter(u => u.isSelected);
+                            if (selected.length > 0) {
+                                selected.forEach(unit => {
+                                    unit.setTarget(mouseX, mouseY);
+                                });
+                            } else {
+                                // Если нет выделенных - снимаем выделение
+                                units.forEach(u => u.isSelected = false);
+                            }
+                        }
+                    }
+                    
+                    isDragging = false;
+                }
+            } else if (e.button === 2) {
+                // ПКМ - снимаем выделение
+                units.forEach(u => u.isSelected = false);
+            }
+        });
+        
+        // Запрет контекстного меню
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
         
         initGame();
     </script>
