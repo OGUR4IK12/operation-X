@@ -190,7 +190,7 @@
             <div style="color: #ff0000; font-size: 20px; margin-bottom: 30px; text-align: center;">
                 <p>⚔️ ЖЕЛТЫЕ ТОЧКИ = БАЗЫ ⚔️</p>
                 <p style="font-size: 16px; margin-top: 10px;">Из них по КД выходят юниты</p>
-                <p style="font-size: 14px; color: #ff6666;">Линия ИЗГИБАЕТСЯ где есть юниты!</p>
+                <p style="font-size: 14px; color: #ff6666;">Зеленые слева, Красные справа</p>
             </div>
             <div class="menuButtons">
                 <button class="menuBtn" onclick="startGame()">НАЧАТЬ БИТВУ</button>
@@ -243,7 +243,7 @@
         let playerScore = 0;
         let enemyScore = 0;
         
-        // Линия - массив точек для изгиба
+        // Линия
         let linePoints = [];
         const SEGMENTS = 40;
         
@@ -297,7 +297,7 @@
                 this.x = x;
                 this.y = y;
                 this.type = type;
-                this.speed = 0.3; // Медленные
+                this.speed = 0.5;
                 this.health = 100;
                 this.maxHealth = 100;
                 this.damage = 15;
@@ -313,11 +313,29 @@
                     this.attackCooldown--;
                 }
                 
-                // Движение к цели (всегда к линии)
+                // Находим ближайшую точку линии для этого юнита
+                let targetX = linePoints[0].x;
+                let minDist = Math.abs(linePoints[0].y - this.y);
+                
+                for (let point of linePoints) {
+                    const dist = Math.abs(point.y - this.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        targetX = point.x;
+                    }
+                }
+                
+                // Движение к линии
                 if (this.type === 'player') {
-                    this.x -= this.speed; // Игроки идут влево к линии
+                    // Игроки СПРАВА от линии, идут ВЛЕВО к линии
+                    if (this.x > targetX + 2) {
+                        this.x -= this.speed;
+                    }
                 } else {
-                    this.x += this.speed; // Враги идут вправо к линии
+                    // Враги СЛЕВА от линии, идут ВПРАВО к линии
+                    if (this.x < targetX - 2) {
+                        this.x += this.speed;
+                    }
                 }
                 
                 // Ограничение по краям
@@ -404,6 +422,7 @@
         
         // Инициализация
         function initGame() {
+            // Желтые базы
             playerBases = [
                 new Base(100, 200, 'player'),
                 new Base(100, 400, 'player'),
@@ -420,7 +439,7 @@
             particles = [];
             lastSpawnTime = Date.now();
             
-            // Инициализация точек линии (изогнутая будет)
+            // Линия посередине
             linePoints = [];
             for (let i = 0; i <= SEGMENTS; i++) {
                 linePoints.push({
@@ -464,7 +483,7 @@
             document.getElementById('blackLinePos').textContent = linePercent + '%';
         }
         
-        // Спавн юнитов из желтых баз по КД
+        // Спавн юнитов по КД
         function spawnUnitsFromBases() {
             if (!gameRunning || paused) return;
             
@@ -473,13 +492,15 @@
             
             lastSpawnTime = currentTime;
             
+            // Спавним игроков из левых баз
             for (let base of playerBases) {
-                let unit = new Unit(base.x + 20, base.y + (Math.random() - 0.5) * 30, 'player');
+                let unit = new Unit(base.x + 30, base.y + (Math.random() - 0.5) * 30, 'player');
                 units.push(unit);
             }
             
+            // Спавним врагов из правых баз
             for (let base of enemyBases) {
-                let unit = new Unit(base.x - 20, base.y + (Math.random() - 0.5) * 30, 'enemy');
+                let unit = new Unit(base.x - 30, base.y + (Math.random() - 0.5) * 30, 'enemy');
                 units.push(unit);
             }
         }
@@ -527,44 +548,38 @@
             });
         }
         
-        // Механика линии - ИЗГИБАЕТСЯ!
+        // Механика линии - ИЗГИБАЕТСЯ
         function updateLine() {
-            // Обновляем каждую точку линии
             for (let i = 0; i <= SEGMENTS; i++) {
-                let playerPush = 0;
-                let enemyPush = 0;
-                let unitCount = 0;
+                let pushForce = 0;
                 
                 // Считаем влияние юнитов на эту точку
                 for (let unit of units) {
                     const dy = Math.abs(unit.y - linePoints[i].y);
                     
-                    // Если юнит рядом по вертикали
                     if (dy < 80) {
-                        unitCount++;
-                        // Сила влияния зависит от расстояния
-                        const influence = (1 - dy / 80) * 2;
+                        const influence = (1 - dy / 80) * 3;
                         
                         if (unit.type === 'player') {
-                            playerPush += influence;
+                            pushForce -= influence; // Игроки толкают влево
                         } else {
-                            enemyPush += influence;
+                            pushForce += influence; // Враги толкают вправо
                         }
                     }
                 }
                 
-                // Если есть юниты рядом - линия изгибается
-                if (unitCount > 0) {
-                    const diff = playerPush - enemyPush;
-                    linePoints[i].x += diff * 1.5;
-                }
+                // Применяем силу к линии
+                linePoints[i].x += pushForce;
                 
-                // Плавность (чтобы линия не была слишком рваной)
-                if (i > 0 && i < SEGMENTS) {
-                    const prevX = linePoints[i-1].x;
-                    const nextX = linePoints[i+1].x;
-                    linePoints[i].x = (linePoints[i].x + prevX + nextX) / 3;
+                // Плавность (сглаживание)
+                if (i > 0) {
+                    linePoints[i].x = (linePoints[i].x + linePoints[i-1].x) / 2;
                 }
+            }
+            
+            // Еще раз сглаживаем в обратном направлении
+            for (let i = SEGMENTS - 1; i >= 0; i--) {
+                linePoints[i].x = (linePoints[i].x + linePoints[i+1].x) / 2;
             }
         }
         
@@ -611,7 +626,7 @@
             }
         }
         
-        // Отрисовка линии (ИЗОГНУТАЯ)
+        // Отрисовка линии
         function drawLine() {
             if (linePoints.length < 2) return;
             
@@ -624,7 +639,6 @@
                 ctx.lineTo(linePoints[i].x, linePoints[i].y);
             }
             
-            // Черная линия с красным свечением
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 6;
             ctx.shadowColor = '#ff0000';
@@ -645,7 +659,7 @@
                 spawnUnitsFromBases();
                 updateCombat();
                 attackBases();
-                updateLine(); // ОБНОВЛЯЕМ ЛИНИЮ С ИЗГИБОМ
+                updateLine();
                 
                 particles = particles.filter(p => !p.update());
                 
@@ -666,6 +680,7 @@
             ctx.fillStyle = '#1e3a1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
+            // Сетка
             ctx.strokeStyle = '#2a4a2a';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 50) {
@@ -681,7 +696,7 @@
                 ctx.stroke();
             }
             
-            drawLine(); // Рисуем ИЗОГНУТУЮ линию
+            drawLine();
             
             [...playerBases, ...enemyBases].forEach(base => base.draw());
             units.forEach(unit => unit.draw());
