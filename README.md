@@ -2,81 +2,331 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ППО України — Захисти небо!</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        * { user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; font-family: 'Courier New', monospace; background: #0a0e1a; overflow: hidden; }
-        #map { height: 100vh; width: 100%; background: #0a1a2a; }
-        .game-ui {
-            position: fixed; bottom: 20px; left: 20px; right: 20px;
-            background: rgba(10, 20, 30, 0.9); backdrop-filter: blur(8px);
-            border-radius: 16px; padding: 12px 20px;
-            display: flex; flex-wrap: wrap; justify-content: space-between;
-            align-items: center; gap: 15px;
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', 'Monaco', monospace;
+            background: #0a0e1a;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+            background: #0a1a2a;
+        }
+        
+        /* Верхня панель */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(10,20,30,0.95), rgba(5,10,15,0.95));
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            padding: 10px 20px;
+            border-bottom: 2px solid #00ffaa;
+            box-shadow: 0 0 20px rgba(0,255,170,0.2);
+        }
+        
+        .game-title {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .game-title h1 {
+            color: #00ffaa;
+            font-size: 24px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ffaa;
+            margin: 0;
+        }
+        .game-title p {
+            color: #88aaff;
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+        
+        /* Статистика зверху */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+        .stats-group {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        .stat {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #88aaff;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ffaa;
+            text-shadow: 0 0 5px #00ffaa;
+        }
+        .balance-value {
+            color: #ffaa44;
+            text-shadow: 0 0 5px #ffaa44;
+        }
+        
+        /* Кнопки швидкості */
+        .speed-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .speed-btn {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #00ffaa;
+            color: #00ffaa;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .speed-btn.active {
+            background: #00ffaa;
+            color: #0a1a2a;
+            box-shadow: 0 0 10px #00ffaa;
+        }
+        
+        /* Вкладки магазину */
+        .shop-tabs {
+            display: flex;
+            gap: 5px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 30px;
+            padding: 3px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #88aaff;
+            padding: 5px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #00ffaa;
+            color: #0a1a2a;
+        }
+        
+        /* Панель магазину (з'являється при активній вкладці) */
+        .shop-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(10, 20, 30, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 15px 20px;
             border: 1px solid rgba(0, 255, 170, 0.3);
             z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
         }
-        .stats-panel {
-            display: flex; gap: 25px;
-            background: rgba(0, 0, 0, 0.6); padding: 8px 18px;
-            border-radius: 40px; border-left: 3px solid #00ffaa;
+        .shop-panel.open {
+            transform: translateY(0);
         }
-        .stat { display: flex; flex-direction: column; align-items: center; }
-        .stat-label { font-size: 10px; color: #88aaff; letter-spacing: 1px; }
-        .stat-value { font-size: 22px; font-weight: bold; color: #00ffaa; text-shadow: 0 0 5px #00ffaa; }
-        .shop {
-            display: flex; gap: 12px;
-            background: rgba(0, 0, 0, 0.5); padding: 5px 15px;
-            border-radius: 50px;
+        .shop-items {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
-        .shop-btn {
+        .shop-item {
             background: linear-gradient(135deg, #1a2a3a, #0a1a2a);
-            border: 1px solid #00ffaa; color: #00ffaa;
-            padding: 8px 16px; border-radius: 40px;
-            cursor: pointer; font-weight: bold;
-            transition: 0.2s; text-align: center;
+            border: 1px solid #00ffaa;
+            border-radius: 12px;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 120px;
         }
-        .shop-btn:hover, .shop-btn.active {
-            background: #00ffaa; color: #0a1a2a;
-            box-shadow: 0 0 15px #00ffaa;
+        .shop-item:hover, .shop-item.active {
+            background: #00ffaa;
+            color: #0a1a2a;
+            transform: scale(1.02);
         }
-        .warning {
-            background: rgba(255, 50, 50, 0.2);
+        .shop-item .item-icon {
+            font-size: 32px;
+        }
+        .shop-item .item-name {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .shop-item .item-price {
+            font-size: 12px;
+            color: #ffaa44;
+        }
+        
+        /* Панель попереджень */
+        .alert-panel {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
             border-left: 4px solid #ff4444;
-            padding: 5px 12px; border-radius: 8px;
-            color: #ff8888; font-size: 12px;
+            border-radius: 8px;
+            padding: 10px 15px;
+            min-width: 200px;
+            z-index: 1000;
+            animation: pulse 0.5s infinite alternate;
         }
+        .alert-title {
+            color: #ff4444;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .alert-message {
+            color: #ff8888;
+            font-size: 12px;
+        }
+        
+        /* Радар */
         .radar-container {
-            position: fixed; top: 20px; right: 20px;
-            width: 180px; height: 180px;
+            position: fixed;
+            top: 120px;
+            left: 20px;
+            width: 150px;
+            height: 150px;
             background: rgba(0, 20, 0, 0.7);
-            border-radius: 50%; border: 2px solid #00ffaa;
+            border-radius: 50%;
+            border: 2px solid #00ffaa;
             z-index: 1000;
         }
-        canvas#radarCanvas { width: 100%; height: 100%; border-radius: 50%; }
-        .drone-icon { filter: drop-shadow(0 0 4px rgba(255,0,0,0.5)); }
-        .unit-icon { filter: drop-shadow(0 0 4px rgba(0,255,170,0.5)); }
+        canvas#radarCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .warning-text {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            background: rgba(255,50,50,0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: #ff8888;
+            font-size: 11px;
+            z-index: 1000;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; border-left-color: #ff4444; }
+            100% { opacity: 1; border-left-color: #ff0000; }
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .threat-blink {
+            animation: blink 0.5s infinite;
+        }
+        
+        @media (max-width: 800px) {
+            .stats-row { flex-direction: column; align-items: stretch; }
+            .stats-group { justify-content: center; }
+            .radar-container { width: 100px; height: 100px; top: 100px; left: 10px; }
+            .alert-panel { top: 100px; right: 10px; min-width: 150px; }
+            .shop-item { min-width: 100px; padding: 8px 12px; }
+        }
     </style>
 </head>
 <body>
 <div id="map"></div>
+
+<div class="top-bar">
+    <div class="game-title">
+        <h1>⚡ ППО УКРАЇНИ ⚡</h1>
+        <p>ЗАХИСТИ НЕБО ВІД ВОРОЖИХ ДРОНІВ</p>
+    </div>
+    <div class="stats-row">
+        <div class="stats-group">
+            <div class="stat"><span class="stat-label">💰</span><span class="stat-value balance-value" id="balanceDisplay">15000</span></div>
+            <div class="stat"><span class="stat-label">🎯</span><span class="stat-value" id="killsDisplay">0</span></div>
+            <div class="stat"><span class="stat-label">🚁</span><span class="stat-value" id="dronesCount">0</span></div>
+        </div>
+        <div class="speed-buttons">
+            <div class="speed-btn" data-speed="1">1x</div>
+            <div class="speed-btn" data-speed="10">10x</div>
+            <div class="speed-btn" data-speed="30">30x</div>
+            <div class="speed-btn active" data-speed="50">50x</div>
+        </div>
+        <div class="shop-tabs">
+            <button class="tab-btn active" data-tab="shop">🏪 МАГАЗИН</button>
+            <button class="tab-btn" data-tab="stats">📊 СТАТИСТИКА</button>
+        </div>
+    </div>
+</div>
+
 <div class="radar-container">
     <canvas id="radarCanvas" width="200" height="200"></canvas>
 </div>
-<div class="game-ui">
-    <div class="stats-panel">
-        <div class="stat"><div class="stat-label">💰 БАЛАНС</div><div class="stat-value" id="balanceDisplay" style="color:#ffaa44">15000</div></div>
-        <div class="stat"><div class="stat-label">🎯 ЗБИТО</div><div class="stat-value" id="killsDisplay">0</div></div>
-        <div class="stat"><div class="stat-label">🚁 ДРОНІВ</div><div class="stat-value" id="dronesCount">0</div></div>
+
+<div class="alert-panel" id="alertPanel" style="display: none;">
+    <div class="alert-title">⚠️ НЕБЕЗПЕКА!</div>
+    <div class="alert-message" id="alertMessage">Шахед наближається!</div>
+</div>
+
+<div class="warning-text" id="warningMsg">🛒 Відкрийте магазин та оберіть зброю →</div>
+
+<div class="shop-panel" id="shopPanel">
+    <div class="shop-items">
+        <div class="shop-item" data-unit="pickup">
+            <div class="item-icon">🔫</div>
+            <div class="item-name">Пікап 12.7мм</div>
+            <div class="item-price">5500 ₴</div>
+        </div>
+        <div class="shop-item" data-unit="shilka">
+            <div class="item-icon">⚡</div>
+            <div class="item-name">ЗСУ-23-4 "Шилка"</div>
+            <div class="item-price">12000 ₴</div>
+        </div>
+        <div class="shop-item" data-unit="reb">
+            <div class="item-icon">📡</div>
+            <div class="item-name">РЕБ (Глушіння)</div>
+            <div class="item-price">8000 ₴</div>
+        </div>
     </div>
-    <div class="shop">
-        <div class="shop-btn" data-unit="pickup">🔫 Пікап<br><span style="font-size:10px">5500₴</span></div>
-        <div class="shop-btn" data-unit="shilka">⚡ Шилка<br><span style="font-size:10px">12000₴</span></div>
-        <div class="shop-btn" data-unit="reb">📡 РЕБ<br><span style="font-size:10px">8000₴</span></div>
+    <div style="text-align: center; margin-top: 10px; font-size: 11px; color: #88aaff;">
+        💡 Клікніть на установку в магазині, потім на карті України
     </div>
-    <div class="warning" id="warningMsg">Оберіть установку та клікніть на карті</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -90,37 +340,86 @@
         { name: "Одеса", lat: 46.48, lng: 30.73 },
         { name: "Львів", lat: 49.84, lng: 24.03 },
         { name: "Запоріжжя", lat: 47.84, lng: 35.14 },
-        { name: "Вінниця", lat: 49.23, lng: 28.48 }
+        { name: "Вінниця", lat: 49.23, lng: 28.48 },
+        { name: "Черкаси", lat: 49.44, lng: 32.06 },
+        { name: "Полтава", lat: 49.59, lng: 34.55 },
+        { name: "Суми", lat: 50.91, lng: 34.80 }
     ];
     
     const LAUNCH_POINTS = [
         { name: "Схід", lat: 48.3, lng: 39.5 },
         { name: "Південь", lat: 46.2, lng: 33.2 },
         { name: "Північ", lat: 51.5, lng: 31.3 },
+        { name: "Схід-2", lat: 47.5, lng: 38.0 },
         { name: "Крим", lat: 45.2, lng: 34.5 }
     ];
     
     const UNITS = {
-        pickup: { name: "Пікап 12.7мм", price: 5500, range: 80, cooldown: 1800, damage: 45, color: "#ffaa44", icon: "🔫" },
-        shilka: { name: "Шилка 23мм", price: 12000, range: 120, cooldown: 900, damage: 85, color: "#ff6644", icon: "⚡" },
-        reb: { name: "РЕБ", price: 8000, range: 45, cooldown: 2500, damage: 0, isJammer: true, jamRadius: 50, color: "#aa88ff", icon: "📡" }
+        pickup: { name: "Пікап 12.7мм", price: 5500, range: 80, cooldown: 1800, damage: 45, color: "#ffaa44", icon: "🔫", img: "resources/pulemet.png" },
+        shilka: { name: "Шилка 23мм", price: 12000, range: 120, cooldown: 900, damage: 85, color: "#ff6644", icon: "⚡", img: "resources/shilka.png" },
+        reb: { name: "РЕБ", price: 8000, range: 45, cooldown: 2500, damage: 0, isJammer: true, jamRadius: 50, color: "#aa88ff", icon: "📡", img: "resources/reb.png" }
     };
     
-    // Межі України (спрощені)
-    const UKRAINE_BOUNDS = L.latLngBounds([44.2, 22.1], [52.4, 40.2]);
+    // Межі України (полігон для перевірки)
+    const UKRAINE_POLYGON = [
+        [52.3, 22.1], [52.2, 33.5], [50.2, 40.0], [46.0, 40.0], 
+        [44.3, 33.9], [45.2, 29.0], [48.0, 22.1]
+    ];
     
-    // Змінні гри
+    // Швидкість гри
+    let gameSpeed = 50;
     let playerBalance = 15000;
     let totalKills = 0;
     let selectedUnit = null;
     let deployedUnits = [];
     let drones = [];
     let map, radarCtx, lastFrameTime = 0;
+    let lastSpawnTime = 0;
+    let alertVisible = false;
+    
+    // Функція перевірки чи точка в межах України
+    function isInsideUkraine(lat, lng) {
+        // Використовуємо Leaflet для перевірки належності до полігону
+        const polygon = L.polygon(UKRAINE_POLYGON);
+        return polygon.getBounds().contains([lat, lng]) && 
+               pointInPolygon(lat, lng, UKRAINE_POLYGON);
+    }
+    
+    function pointInPolygon(lat, lng, polygon) {
+        let inside = false;
+        for (let i = 0, j = polygon.length-1; i < polygon.length; j = i++) {
+            const xi = polygon[i][0], yi = polygon[i][1];
+            const xj = polygon[j][0], yj = polygon[j][1];
+            const intersect = ((yi > lng) != (yj > lng)) &&
+                (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
     
     function updateUI() {
         document.getElementById('balanceDisplay').innerText = Math.floor(playerBalance);
         document.getElementById('killsDisplay').innerText = totalKills;
         document.getElementById('dronesCount').innerText = drones.length;
+        
+        // Оновлення панелі попереджень
+        const threatDrones = drones.filter(d => d.isAlive && !d.isJammed && d.progress > 0.3);
+        const alertPanel = document.getElementById('alertPanel');
+        const alertMsg = document.getElementById('alertMessage');
+        
+        if(threatDrones.length > 0) {
+            alertPanel.style.display = 'block';
+            const nearest = threatDrones[0];
+            const remaining = Math.round((1 - nearest.progress) * 100);
+            alertMsg.innerHTML = `🚁 Шахед наближається! ${remaining}% до цілі (${nearest.target.name})`;
+            alertPanel.classList.add('threat-blink');
+        } else if(drones.length > 0) {
+            alertPanel.style.display = 'block';
+            alertMsg.innerHTML = `⚠️ У небі ${drones.length} ворожих дронів!`;
+            alertPanel.classList.remove('threat-blink');
+        } else {
+            alertPanel.style.display = 'none';
+        }
     }
     
     function addMoney(amount) {
@@ -169,15 +468,14 @@
         update(deltaTime) {
             if(!this.isAlive) return;
             
-            // Перевірка глушіння
+            // Глушіння
             if(this.isJammed && Date.now() < this.jamEndTime) {
-                // Дрон стоїть на місці при глушінні
                 return;
             } else {
                 this.isJammed = false;
             }
             
-            this.progress += this.speed * deltaTime * 0.08;
+            this.progress += this.speed * deltaTime * (gameSpeed / 30);
             if(this.progress >= 1) {
                 this.isAlive = false;
                 playerBalance = Math.max(0, playerBalance - 1200);
@@ -194,11 +492,13 @@
         render() {
             if(!this.isAlive) return;
             if(!this.marker) {
+                // Використовуємо emoji, але можна замінити на geran2.png
                 const droneIcon = L.divIcon({ html: '🚁', iconSize: [28,28], className: 'drone-icon' });
                 this.marker = L.marker([this.currentLat, this.currentLng], { icon: droneIcon }).addTo(map);
             }
             if(this.marker._icon) {
                 this.marker._icon.style.filter = this.isJammed ? 'hue-rotate(180deg)' : '';
+                this.marker._icon.style.opacity = this.isJammed ? '0.7' : '1';
             }
         }
         
@@ -209,7 +509,7 @@
             totalKills++;
             addMoney(900);
             updateUI();
-            showFloatingText('💥 ЗБИТО!', '#ffaa44', [this.currentLat, this.currentLng]);
+            showFloatingText('💥 ЗБИТО! +900₴', '#ffaa44', [this.currentLat, this.currentLng]);
         }
         
         applyJam(duration = 3000) {
@@ -270,6 +570,7 @@
         
         render() {
             if(!this.marker) {
+                // Використовуємо emoji, але можна замінити на png з resources/
                 this.marker = L.marker([this.lat, this.lng], { 
                     icon: L.divIcon({ html: this.data.icon, iconSize: [32,32], className: 'unit-icon' })
                 }).addTo(map);
@@ -336,7 +637,6 @@
         if(dt < 0) dt = 16;
         lastFrameTime = now;
         
-        // Оновлення дронів
         for(let i=0; i<drones.length; i++) {
             drones[i].update(dt / 1000);
             if(!drones[i].isAlive) {
@@ -345,12 +645,10 @@
             }
         }
         
-        // Глушіння від РЕБ
         for(let unit of deployedUnits) {
             if(unit.type === 'reb') unit.jamDrones(drones);
         }
         
-        // Стрільба
         for(let unit of deployedUnits) {
             if(unit.data.damage > 0) {
                 for(let drone of drones) {
@@ -360,7 +658,6 @@
             }
         }
         
-        // Відмальовка
         for(let unit of deployedUnits) unit.render();
         for(let drone of drones) drone.render();
         drawRadar();
@@ -368,11 +665,11 @@
     }
     
     // ========== СПАВН ДРОНІВ ==========
-    let lastSpawnTime = 0;
     function spawnDrone() {
         const now = Date.now();
-        if(now - lastSpawnTime < 4000) return;
-        if(drones.length >= 20) return;
+        const interval = Math.max(2000, 5000 - Math.floor(totalKills / 20) * 100);
+        if(now - lastSpawnTime < interval) return;
+        if(drones.length >= 25) return;
         
         const start = LAUNCH_POINTS[Math.floor(Math.random() * LAUNCH_POINTS.length)];
         const target = CITIES[Math.floor(Math.random() * CITIES.length)];
@@ -382,33 +679,58 @@
         updateUI();
     }
     
+    // ========== ВСТАНОВЛЕННЯ ШВИДКОСТІ ==========
+    function setSpeed(speed) {
+        gameSpeed = speed;
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            if(parseInt(btn.dataset.speed) === speed) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+    
     // ========== ІНІЦІАЛІЗАЦІЯ ==========
     function init() {
+        // Карта (повний екран)
         map = L.map('map').setView([48.9, 31.5], 6);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
         
         // Полігон України
-        const ukrainePoly = L.polygon([
-            [52.3, 22.1], [52.2, 33.5], [50.2, 40.0], [46.0, 40.0], [44.3, 33.9], [45.2, 29.0], [48.0, 22.1]
-        ], { color: '#3388ff', weight: 2, fillOpacity: 0.05 }).addTo(map);
+        const ukrainePoly = L.polygon(UKRAINE_POLYGON, { 
+            color: '#3388ff', 
+            weight: 2, 
+            fillOpacity: 0.05,
+            className: 'ukraine-border'
+        }).addTo(map);
         
         radarCtx = document.getElementById('radarCanvas').getContext('2d');
         
-        // Клік по карті для розміщення
+        // Клік по карті для розміщення установки
         map.on('click', (e) => {
             if(!selectedUnit) {
-                document.getElementById('warningMsg').innerHTML = "⚠️ Оберіть установку в меню!";
+                document.getElementById('warningMsg').innerHTML = "⚠️ Оберіть установку в магазині!";
+                document.getElementById('warningMsg').style.color = "#ff8888";
                 return;
             }
-            if(!UKRAINE_BOUNDS.contains(e.latlng)) {
-                document.getElementById('warningMsg').innerHTML = "❌ Розміщуйте установки лише на території України!";
+            if(!isInsideUkraine(e.latlng.lat, e.latlng.lng)) {
+                document.getElementById('warningMsg').innerHTML = "❌ Можна ставити лише на території України!";
+                document.getElementById('warningMsg').style.color = "#ff8888";
+                setTimeout(() => {
+                    document.getElementById('warningMsg').innerHTML = "🛒 Відкрийте магазин та оберіть зброю →";
+                    document.getElementById('warningMsg').style.color = "#88aaff";
+                }, 2000);
                 return;
             }
             const price = UNITS[selectedUnit].price;
             if(playerBalance < price) {
                 document.getElementById('warningMsg').innerHTML = "💰 Недостатньо коштів!";
+                setTimeout(() => {
+                    document.getElementById('warningMsg').innerHTML = "🛒 Відкрийте магазин та оберіть зброю →";
+                }, 2000);
                 return;
             }
             playerBalance -= price;
@@ -417,27 +739,58 @@
             newUnit.render();
             updateUI();
             document.getElementById('warningMsg').innerHTML = `✅ ${UNITS[selectedUnit].name} розміщено!`;
+            setTimeout(() => {
+                document.getElementById('warningMsg').innerHTML = "🛒 Відкрийте магазин та оберіть зброю →";
+            }, 2000);
             selectedUnit = null;
-            document.querySelectorAll('.shop-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.shop-item').forEach(item => item.classList.remove('active'));
         });
         
-        // Вибір установки
-        document.querySelectorAll('.shop-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const unitType = btn.dataset.unit;
+        // Вибір установки з магазину
+        document.querySelectorAll('.shop-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const unitType = item.dataset.unit;
                 if(selectedUnit === unitType) {
                     selectedUnit = null;
-                    btn.classList.remove('active');
+                    item.classList.remove('active');
                     document.getElementById('warningMsg').innerHTML = "⚡ Режим розміщення вимкнено";
                 } else {
-                    document.querySelectorAll('.shop-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.shop-item').forEach(i => i.classList.remove('active'));
                     selectedUnit = unitType;
-                    btn.classList.add('active');
-                    document.getElementById('warningMsg').innerHTML = `📍 Розмістіть ${UNITS[selectedUnit].name} на карті`;
+                    item.classList.add('active');
+                    document.getElementById('warningMsg').innerHTML = `📍 Розмістіть ${UNITS[selectedUnit].name} на карті України`;
+                    document.getElementById('warningMsg').style.color = "#00ffaa";
                 }
             });
         });
         
+        // Кнопки швидкості
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = parseInt(btn.dataset.speed);
+                setSpeed(speed);
+            });
+        });
+        
+        // Вкладки магазину/статистики
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                if(tab === 'shop') {
+                    document.getElementById('shopPanel').classList.add('open');
+                } else {
+                    document.getElementById('shopPanel').classList.remove('open');
+                }
+            });
+        });
+        
+        // Відкриваємо магазин за замовчуванням
+        document.getElementById('shopPanel').classList.add('open');
+        
+        // Запуск ігрових інтервалів
         lastFrameTime = Date.now();
         setInterval(gameUpdate, 50);
         setInterval(spawnDrone, 500);
