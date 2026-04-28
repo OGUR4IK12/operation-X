@@ -14,7 +14,7 @@
         }
         
         body {
-            background: #0a0a0a;
+            background: #050505;
             font-family: 'Courier New', 'Fira Code', 'Monaco', monospace;
             overflow: hidden;
             height: 100vh;
@@ -23,98 +23,68 @@
         
         /* Термінальний стиль */
         .terminal {
-            background: #0a0a0a;
+            background: #050505;
             color: #00ff88;
             height: 100vh;
             width: 100vw;
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
         }
         
-        /* Верхня панель як у SAM Protocol */
+        /* Верхня панель як на скріншоті */
         .top-bar {
-            background: #050505;
+            background: #0a0a0a;
             border-bottom: 1px solid #00ff44;
-            padding: 8px 16px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             z-index: 100;
-            font-size: 12px;
-        }
-        
-        .logo-area {
-            display: flex;
-            align-items: baseline;
-            gap: 15px;
         }
         
         .logo {
             color: #00ff88;
             font-weight: bold;
             font-size: 14px;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         .menu-links {
             display: flex;
-            gap: 20px;
+            gap: 25px;
         }
         
         .menu-link {
             color: #00aa55;
             cursor: pointer;
-            transition: 0.2s;
-            font-size: 11px;
+            font-size: 12px;
         }
         
-        .menu-link:hover, .menu-link.active {
+        .menu-link:hover {
             color: #00ff88;
-            text-shadow: 0 0 5px #00ff88;
+            text-shadow: 0 0 3px #00ff88;
         }
         
         .balance-area {
             color: #ffaa44;
             font-weight: bold;
+            font-size: 13px;
         }
         
         .time-area {
             color: #5588aa;
             font-family: monospace;
-        }
-        
-        /* Друга панель (області) */
-        .region-bar {
-            background: #0a100a;
-            border-bottom: 1px solid #00aa44;
-            padding: 6px 16px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-size: 10px;
-            z-index: 99;
-        }
-        
-        .region {
-            color: #44aa66;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        
-        .region:hover, .region.active {
-            color: #88ffaa;
-            text-shadow: 0 0 3px #88ffaa;
+            font-size: 12px;
         }
         
         /* Мапа */
         #map {
             flex: 1;
             width: 100%;
-            background: #0a1a0a;
+            background: #0a100a;
             z-index: 1;
         }
         
@@ -126,12 +96,9 @@
             right: 20px;
             background: #0a0a0a;
             border: 1px solid #00ff44;
-            border-radius: 0;
-            padding: 0;
             z-index: 1000;
             display: none;
             flex-direction: column;
-            font-family: monospace;
             box-shadow: 0 0 20px rgba(0,255,68,0.1);
         }
         
@@ -142,36 +109,42 @@
         .terminal-header {
             background: #00aa44;
             color: #0a0a0a;
-            padding: 6px 12px;
+            padding: 8px 15px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
         }
         
         .terminal-body {
-            padding: 15px;
-            max-height: 60vh;
+            padding: 20px;
+            max-height: 55vh;
             overflow-y: auto;
         }
         
         .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .shop-card {
             border: 1px solid #00aa44;
-            padding: 12px;
+            padding: 15px 20px;
             cursor: pointer;
-            transition: 0.2s;
+            text-align: center;
+            min-width: 140px;
             background: #0a150a;
         }
         
         .shop-card:hover, .shop-card.active {
             background: #00aa44;
             color: #0a0a0a;
-            border-color: #00ff88;
+        }
+        
+        .shop-card .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
         }
         
         .shop-card .price {
@@ -185,10 +158,10 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 160px;
+            width: 150px;
             background: #050505;
             border: 1px solid #00aa44;
-            padding: 10px;
+            padding: 8px;
             z-index: 100;
         }
         
@@ -201,16 +174,15 @@
         
         canvas#radarCanvas {
             width: 100%;
-            height: 100%;
             background: #0a1a0a;
         }
         
         /* Панель моніторингу */
         .monitor-panel {
             position: fixed;
-            top: 100px;
+            top: 80px;
             right: 20px;
-            width: 220px;
+            width: 200px;
             background: #0a0a0a;
             border: 1px solid #00aa44;
             padding: 10px;
@@ -221,23 +193,18 @@
         .monitor-title {
             color: #00ff88;
             border-bottom: 1px solid #00aa44;
-            padding-bottom: 3px;
+            padding-bottom: 4px;
             margin-bottom: 8px;
         }
         
         .monitor-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             color: #66aa88;
         }
         
-        .threat-active {
-            color: #ff4444;
-            animation: blink 0.5s infinite;
-        }
-        
-        /* Статус бар (нижній) */
+        /* Статус бар */
         .status-bar {
             position: fixed;
             bottom: 0;
@@ -245,7 +212,7 @@
             right: 0;
             background: #050505;
             border-top: 1px solid #00aa44;
-            padding: 4px 16px;
+            padding: 5px 20px;
             display: flex;
             justify-content: space-between;
             font-size: 10px;
@@ -254,69 +221,58 @@
         }
         
         @keyframes blink {
-            0% { opacity: 1; text-shadow: 0 0 0 red; }
-            100% { opacity: 0.7; text-shadow: 0 0 5px red; }
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .threat-alert {
+            animation: blink 0.8s infinite;
+            color: #ff4444;
         }
         
-        /* Стилі Leaflet */
+        /* Стилі карти */
         .leaflet-control-attribution {
             background: rgba(0,0,0,0.7) !important;
             color: #448866 !important;
             font-size: 8px !important;
         }
         
-        .leaflet-tile-pane {
-            filter: grayscale(0.3) contrast(1.2) brightness(0.6);
-        }
-        
-        /* Скролл */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
             background: #0a0a0a;
         }
         ::-webkit-scrollbar-thumb {
             background: #00aa44;
-            border-radius: 0;
         }
         
-        @media (max-width: 800px) {
-            .top-bar { flex-direction: column; align-items: stretch; }
+        @media (max-width: 700px) {
             .monitor-panel { display: none; }
             .radar-panel { width: 100px; bottom: 40px; }
+            .top-bar { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
 <div class="terminal">
-    <!-- Верхня панель як у SAM Protocol -->
+    <!-- Верхня панель в стилі SAM Protocol -->
     <div class="top-bar">
-        <div class="logo-area">
-            <div class="logo">▶ SAM PROTOCOL (DEMO)</div>
-            <div class="menu-links">
-                <span class="menu-link" data-tab="shop">МАГАЗИН</span>
-                <span class="menu-link" data-tab="stats">ДАНІ</span>
-                <span class="menu-link" data-tab="radar">РАДАР</span>
-            </div>
+        <div class="logo">▶ SAM PROTOCOL (DEMO)</div>
+        <div class="menu-links">
+            <span class="menu-link" data-tab="shop">МАГАЗИН</span>
+            <span class="menu-link" data-tab="stats">СТАТИСТИКА</span>
+            <span class="menu-link" data-tab="help">ДОВІДКА</span>
         </div>
         <div class="balance-area">💰 БАЛАНС: <span id="balanceDisplay">15000</span> ₴</div>
         <div class="time-area" id="timeDisplay">ДЕНЬ 1 | 09:41</div>
     </div>
     
-    <!-- Панель областей -->
-    <div class="region-bar" id="regionBar">
-        <span class="region active" data-region="poltava">POLTAVA OBLAST</span>
-        <span class="region" data-region="kharkiv">KHARKIV OBLAST</span>
-        <span class="region" data-region="dnipro">DNIPROPETROVSK OBLAST</span>
-        <span class="region" data-region="donetsk">DONETSK OBLAST</span>
-    </div>
-    
-    <!-- Мапа -->
+    <!-- Карта -->
     <div id="map"></div>
     
     <!-- Радар -->
     <div class="radar-panel">
-        <div class="radar-title">⚡ RADAR ARRAY ⚡</div>
-        <canvas id="radarCanvas" width="140" height="140"></canvas>
+        <div class="radar-title">⚡ RADAR ARRAY</div>
+        <canvas id="radarCanvas" width="130" height="130"></canvas>
     </div>
     
     <!-- Моніторинг -->
@@ -324,37 +280,40 @@
         <div class="monitor-title">📡 THREAT MONITOR</div>
         <div class="monitor-row">АКТИВНІ ЦІЛІ: <span id="threatCount">0</span></div>
         <div class="monitor-row">ЗБИТО: <span id="killsDisplay">0</span></div>
-        <div class="monitor-row" id="threatWarning">СТАТУС: 🔴 НОРМАЛЬНО</div>
+        <div class="monitor-row" id="threatStatus">СТАТУС: 🟢 НОРМАЛЬНО</div>
     </div>
     
-    <!-- Термінальне вікно магазину -->
+    <!-- Термінальний магазин -->
     <div class="terminal-window" id="shopWindow">
         <div class="terminal-header">
-            <span>⚡ SAM PROTOCOL — ТЕРМІНАЛ ЗАКУПІВЛІ ⚡</span>
+            <span>⚡ SAM PROTOCOL — ТЕРМІНАЛ ЗАКУПІВЛІ</span>
             <span style="cursor:pointer" id="closeShop">[X]</span>
         </div>
         <div class="terminal-body">
             <div class="shop-grid" id="shopGrid">
                 <div class="shop-card" data-unit="pickup">
-                    <div>🔫 ПІКАП 12.7мм</div>
+                    <div class="icon">🔫</div>
+                    <div>ПІКАП 12.7мм</div>
                     <div class="price">5 500 ₴</div>
                 </div>
                 <div class="shop-card" data-unit="shilka">
-                    <div>⚡ ЗСУ-23-4 "ШИЛКА"</div>
+                    <div class="icon">⚡</div>
+                    <div>ЗСУ-23-4 "ШИЛКА"</div>
                     <div class="price">12 000 ₴</div>
                 </div>
                 <div class="shop-card" data-unit="reb">
-                    <div>📡 РЕБ (ГЛУШІННЯ)</div>
+                    <div class="icon">📡</div>
+                    <div>РЕБ (ГЛУШІННЯ)</div>
                     <div class="price">8 000 ₴</div>
                 </div>
             </div>
-            <div style="margin-top: 12px; font-size: 10px; color: #448866; text-align: center;">
-                > ОБЕРІТЬ ЗБРОЮ ТА КЛІКНІТЬ НА КАРТІ
+            <div style="margin-top: 15px; font-size: 10px; color: #448866; text-align: center;">
+                > ОБЕРІТЬ ЗБРОЮ ТА КЛІКНІТЬ НА КАРТІ УКРАЇНИ
             </div>
         </div>
     </div>
     
-    <!-- Статус-бар -->
+    <!-- Статус бар -->
     <div class="status-bar">
         <span>Шаблон - (928373)</span>
         <span>SAM Protocol (DEMO) by C</span>
@@ -365,49 +324,41 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
-    // ========== КОНФІГ ==========
+    // ========== МІСТА ==========
     const CITIES = [
-        { name: "ПОЛТАВА", lat: 49.59, lng: 34.55, region: "poltava" },
-        { name: "КРЕМЕНЧУК", lat: 49.07, lng: 33.42, region: "poltava" },
-        { name: "ХАРКІВ", lat: 49.99, lng: 36.23, region: "kharkiv" },
-        { name: "КРАМАТОРСЬК", lat: 48.72, lng: 37.58, region: "donetsk" },
-        { name: "ДНІПРО", lat: 48.46, lng: 35.04, region: "dnipro" },
-        { name: "СВЄРОДОНЕЦЬК", lat: 48.63, lng: 38.54, region: "donetsk" },
-        { name: "ЧЕРКАСИ", lat: 49.44, lng: 32.06, region: "poltava" }
+        { name: "КИЇВ", lat: 50.45, lng: 30.52 },
+        { name: "ХАРКІВ", lat: 49.99, lng: 36.23 },
+        { name: "ДНІПРО", lat: 48.46, lng: 35.04 },
+        { name: "ОДЕСА", lat: 46.48, lng: 30.73 },
+        { name: "ЛЬВІВ", lat: 49.84, lng: 24.03 },
+        { name: "ЗАПОРІЖЖЯ", lat: 47.84, lng: 35.14 },
+        { name: "ВІННИЦЯ", lat: 49.23, lng: 28.48 },
+        { name: "ЧЕРКАСИ", lat: 49.44, lng: 32.06 },
+        { name: "ПОЛТАВА", lat: 49.59, lng: 34.55 },
+        { name: "СУМИ", lat: 50.91, lng: 34.80 }
     ];
     
     const LAUNCH_POINTS = [
-        { name: "СХІД", lat: 48.3, lng: 39.5 },
-        { name: "ПІВДЕНЬ", lat: 46.2, lng: 33.2 },
-        { name: "ПІВНІЧ", lat: 51.5, lng: 31.3 },
-        { name: "БІЛГОРОД", lat: 50.6, lng: 36.6 }
+        { lat: 48.3, lng: 39.5 },
+        { lat: 46.2, lng: 33.2 },
+        { lat: 51.5, lng: 31.3 },
+        { lat: 50.6, lng: 36.6 },
+        { lat: 47.5, lng: 38.0 }
     ];
     
+    // ========== ЗБРОЯ (з вашими іконками) ==========
     const UNITS = {
-        pickup: { name: "ПІКАП 12.7мм", price: 5500, range: 80, cooldown: 1600, damage: 45, color: "#ffaa44", icon: "🔫" },
-        shilka: { name: "ШИЛКА 23мм", price: 12000, range: 120, cooldown: 800, damage: 85, color: "#ff6644", icon: "⚡" },
-        reb: { name: "РЕБ", price: 8000, range: 45, cooldown: 2000, damage: 0, isJammer: true, jamRadius: 50, color: "#aa88ff", icon: "📡" }
+        pickup: { name: "ПІКАП 12.7мм", price: 5500, range: 80, cooldown: 1600, damage: 45, color: "#ffaa44", icon: "🔫", img: "resources/pulemet.png" },
+        shilka: { name: "ШИЛКА 23мм", price: 12000, range: 120, cooldown: 800, damage: 85, color: "#ff6644", icon: "⚡", img: "resources/shilka.png" },
+        reb: { name: "РЕБ", price: 8000, range: 45, cooldown: 2000, damage: 0, isJammer: true, jamRadius: 50, color: "#aa88ff", icon: "📡", img: "resources/reb.png" }
     };
     
-    // Полігон України
+    // Межі України
     const UKRAINE_POLYGON = [
         [52.3, 22.1], [52.2, 33.5], [50.2, 40.0], [46.0, 40.0], 
         [44.3, 33.9], [45.2, 29.0], [48.0, 22.1]
     ];
     
-    // Змінні гри
-    let playerBalance = 15000;
-    let totalKills = 0;
-    let selectedUnit = null;
-    let deployedUnits = [];
-    let drones = [];
-    let map, radarCtx, lastFrameTime = 0;
-    let lastSpawnTime = 0;
-    let gameSpeed = 30;
-    let currentRegion = "poltava";
-    let gameTime = { day: 1, hour: 9, minute: 41 };
-    
-    // Функції
     function pointInPolygon(lat, lng, polygon) {
         let inside = false;
         for (let i = 0, j = polygon.length-1; i < polygon.length; j = i++) {
@@ -424,28 +375,35 @@
         return pointInPolygon(lat, lng, UKRAINE_POLYGON);
     }
     
+    // Змінні гри
+    let playerBalance = 15000;
+    let totalKills = 0;
+    let selectedUnit = null;
+    let deployedUnits = [];
+    let drones = [];
+    let map, radarCtx, lastFrameTime = 0;
+    let lastSpawnTime = 0;
+    let gameTime = { day: 1, hour: 9, minute: 41 };
+    
     function updateUI() {
         document.getElementById('balanceDisplay').innerText = Math.floor(playerBalance).toLocaleString();
         document.getElementById('killsDisplay').innerText = totalKills;
         document.getElementById('threatCount').innerText = drones.filter(d => d.isAlive && !d.isJammed).length;
         
-        const threatWarning = document.getElementById('threatWarning');
-        if(drones.length > 5) {
-            threatWarning.innerHTML = "СТАТУС: 🔴 КРИТИЧНА НЕБЕЗПЕКА!";
-            threatWarning.className = "monitor-row threat-active";
+        const threatStatus = document.getElementById('threatStatus');
+        if(drones.length > 8) {
+            threatStatus.innerHTML = "СТАТУС: 🔴 КРИТИЧНО!";
+            threatStatus.className = "monitor-row threat-alert";
         } else if(drones.length > 0) {
-            threatWarning.innerHTML = "СТАТУС: 🟡 УВАГА! ШАХЕДИ В НЕБІ";
-            threatWarning.className = "monitor-row";
+            threatStatus.innerHTML = "СТАТУС: 🟡 УВАГА!";
+            threatStatus.className = "monitor-row";
         } else {
-            threatWarning.innerHTML = "СТАТУС: 🟢 НОРМАЛЬНО";
-            threatWarning.className = "monitor-row";
+            threatStatus.innerHTML = "СТАТУС: 🟢 НОРМАЛЬНО";
+            threatStatus.className = "monitor-row";
         }
         
-        // Час
-        const timeStr = `ДЕНЬ ${gameTime.day} | ${String(gameTime.hour).padStart(2,'0')}:${String(gameTime.minute).padStart(2,'0')}`;
-        document.getElementById('timeDisplay').innerHTML = timeStr;
+        document.getElementById('timeDisplay').innerHTML = `ДЕНЬ ${gameTime.day} | ${String(gameTime.hour).padStart(2,'0')}:${String(gameTime.minute).padStart(2,'0')}`;
         
-        // Статус бар час
         const now = new Date();
         document.getElementById('clockStatus').innerHTML = `${String(gameTime.hour).padStart(2,'0')}:${String(gameTime.minute).padStart(2,'0')} | ${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.2026`;
     }
@@ -475,10 +433,9 @@
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
     
-    // ========== КЛАС ДРОНА ==========
+    // ========== ДРОН ==========
     class Drone {
         constructor(start, target) {
-            this.id = Math.random();
             this.startLat = start.lat;
             this.startLng = start.lng;
             this.target = target;
@@ -498,11 +455,11 @@
             if(this.isJammed && Date.now() < this.jamEndTime) return;
             else this.isJammed = false;
             
-            this.progress += this.speed * deltaTime * (gameSpeed / 30);
+            this.progress += this.speed * deltaTime * 0.03;
             if(this.progress >= 1) {
                 this.isAlive = false;
                 playerBalance = Math.max(0, playerBalance - 1500);
-                showFloatingText(`-1500₴ (${this.target.name} АТАКОВАНО)`, '#ff4444', [this.currentLat, this.currentLng]);
+                showFloatingText(`-1500₴ (${this.target.name} атаковано)`, '#ff4444', [this.currentLat, this.currentLng]);
                 if(this.marker) map.removeLayer(this.marker);
                 updateUI();
                 return;
@@ -515,12 +472,12 @@
         render() {
             if(!this.isAlive) return;
             if(!this.marker) {
-                const droneIcon = L.divIcon({ html: '✈', iconSize: [24,24], className: 'drone-marker' });
-                this.marker = L.marker([this.currentLat, this.currentLng], { icon: droneIcon }).addTo(map);
+                const icon = L.divIcon({ html: '✈', iconSize: [24,24], className: 'drone-marker' });
+                this.marker = L.marker([this.currentLat, this.currentLng], { icon: icon }).addTo(map);
             }
             if(this.marker._icon) {
                 this.marker._icon.style.filter = this.isJammed ? 'hue-rotate(180deg)' : '';
-                this.marker._icon.style.opacity = this.isJammed ? '0.5' : '1';
+                this.marker._icon.style.opacity = this.isJammed ? '0.6' : '1';
             }
         }
         
@@ -530,7 +487,6 @@
             if(this.marker) map.removeLayer(this.marker);
             totalKills++;
             addMoney(1200);
-            updateUI();
             showFloatingText('💥 ЗБИТО! +1200₴', '#ffaa44', [this.currentLat, this.currentLng]);
         }
         
@@ -540,7 +496,7 @@
         }
     }
     
-    // ========== КЛАС УСТАНОВКИ ==========
+    // ========== УСТАНОВКА ==========
     class DefenseUnit {
         constructor(type, lat, lng) {
             this.type = type;
@@ -564,7 +520,7 @@
                 this.lastShotTime = Date.now();
                 this.ammo--;
                 drone.hp -= this.data.damage;
-                this.showTrail(drone.currentLat, drone.currentLng);
+                this.showEffect(drone.currentLat, drone.currentLng);
                 if(drone.hp <= 0) drone.destroy();
                 return true;
             }
@@ -581,20 +537,21 @@
             }
         }
         
-        showTrail(lat, lng) {
+        showEffect(lat, lng) {
             const point = map.latLngToContainerPoint([lat, lng]);
             const div = document.createElement('div');
             div.innerHTML = '💥';
-            div.style.cssText = `position:absolute; left:${point.x}px; top:${point.y}px; font-size:16px; pointer-events:none; z-index:2000; transition:all 0.2s ease-out;`;
+            div.style.cssText = `position:absolute; left:${point.x}px; top:${point.y}px; font-size:18px; pointer-events:none; z-index:2000; transition:all 0.2s ease-out;`;
             document.body.appendChild(div);
             setTimeout(() => { div.style.transform = 'scale(1.5)'; div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 10);
         }
         
         render() {
             if(!this.marker) {
-                this.marker = L.marker([this.lat, this.lng], { 
-                    icon: L.divIcon({ html: this.data.icon, iconSize: [28,28], className: 'unit-marker' })
-                }).addTo(map);
+                // Використовуємо emoji, але ви можете замінити на ваші PNG:
+                // const icon = L.icon({ iconUrl: this.data.img, iconSize: [32,32] });
+                const icon = L.divIcon({ html: this.data.icon, iconSize: [28,28], className: 'unit-marker' });
+                this.marker = L.marker([this.lat, this.lng], { icon: icon }).addTo(map);
                 this.rangeCircle = L.circle([this.lat, this.lng], {
                     radius: this.data.range * 1000,
                     color: this.data.color,
@@ -603,10 +560,7 @@
                     weight: 1
                 }).addTo(map);
             }
-            if(this.marker._icon) {
-                this.marker._icon.style.filter = `drop-shadow(0 0 3px ${this.data.color})`;
-            }
-            this.marker.bindTooltip(`${this.data.name} | 🎯${this.ammo}`, { sticky: true, className: 'terminal-tooltip' });
+            this.marker.bindTooltip(`${this.data.name} | 🎯${this.ammo}`, { sticky: true });
         }
     }
     
@@ -614,14 +568,13 @@
     function drawRadar() {
         if(!radarCtx || !map) return;
         const canvas = document.getElementById('radarCanvas');
-        canvas.width = 140;
-        canvas.height = 140;
-        const w = 140, h = 140;
+        canvas.width = 130;
+        canvas.height = 130;
+        const w = 130, h = 130;
         radarCtx.clearRect(0, 0, w, h);
         radarCtx.fillStyle = '#0a1a0a';
         radarCtx.fillRect(0, 0, w, h);
         radarCtx.strokeStyle = '#00ff88';
-        radarCtx.lineWidth = 1;
         radarCtx.beginPath();
         radarCtx.arc(w/2, h/2, w/2 - 2, 0, 2*Math.PI);
         radarCtx.stroke();
@@ -650,15 +603,15 @@
         }
     }
     
-    // ========== ІГРОВИЙ ЦИКЛ ==========
+    // ========== ЦИКЛ ГРИ ==========
     function gameUpdate() {
         const now = Date.now();
         let dt = Math.min(100, now - lastFrameTime);
         if(dt < 0) dt = 16;
         lastFrameTime = now;
         
-        // Оновлення часу
-        if(lastFrameTime % 3000 < 50) {
+        // Час
+        if(Math.random() < 0.02) {
             gameTime.minute += 1;
             if(gameTime.minute >= 60) {
                 gameTime.minute = 0;
@@ -701,55 +654,46 @@
     // ========== СПАВН ДРОНІВ ==========
     function spawnDrone() {
         const now = Date.now();
-        const interval = Math.max(2500, 5000 - Math.floor(totalKills / 25) * 150);
+        const interval = Math.max(3000, 5000 - Math.floor(totalKills / 30) * 100);
         if(now - lastSpawnTime < interval) return;
-        if(drones.length >= 22) return;
+        if(drones.length >= 25) return;
         
         const start = LAUNCH_POINTS[Math.floor(Math.random() * LAUNCH_POINTS.length)];
-        const citiesInRegion = CITIES.filter(c => c.region === currentRegion);
-        const target = citiesInRegion.length ? citiesInRegion[Math.floor(Math.random() * citiesInRegion.length)] : CITIES[Math.floor(Math.random() * CITIES.length)];
-        
-        const newDrone = new Drone(start, target);
-        drones.push(newDrone);
+        const target = CITIES[Math.floor(Math.random() * CITIES.length)];
+        drones.push(new Drone(start, target));
         lastSpawnTime = now;
         updateUI();
     }
     
     // ========== ІНІЦІАЛІЗАЦІЯ ==========
     function init() {
-        map = L.map('map').setView([49.0, 33.5], 6.5);
+        map = L.map('map').setView([48.9, 31.5], 6.5);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
         
-        const ukrainePoly = L.polygon(UKRAINE_POLYGON, { 
-            color: '#00ff88', 
-            weight: 1, 
-            fillOpacity: 0.02,
-            className: 'ukraine-border'
-        }).addTo(map);
+        L.polygon(UKRAINE_POLYGON, { color: '#00ff88', weight: 1, fillOpacity: 0.03 }).addTo(map);
         
         radarCtx = document.getElementById('radarCanvas').getContext('2d');
         
         // Клік по карті
         map.on('click', (e) => {
             if(!selectedUnit) {
-                document.getElementById('closeShop').click();
+                alert("⚡ Оберіть зброю в МАГАЗИНІ!");
                 return;
             }
             if(!isInsideUkraine(e.latlng.lat, e.latlng.lng)) {
-                alert("❌ РОЗМІЩЕННЯ ДОЗВОЛЕНЕ ТІЛЬКИ НА ТЕРИТОРІЇ УКРАЇНИ");
+                alert("❌ Розміщення дозволене тільки на території України!");
                 return;
             }
-            const price = UNITS[selectedUnit].price;
-            if(playerBalance < price) {
-                alert("💰 НЕДОСТАТНЬО КОШТІВ!");
+            if(playerBalance < UNITS[selectedUnit].price) {
+                alert("💰 Недостатньо коштів!");
                 return;
             }
-            playerBalance -= price;
-            const newUnit = new DefenseUnit(selectedUnit, e.latlng.lat, e.latlng.lng);
-            deployedUnits.push(newUnit);
-            newUnit.render();
+            playerBalance -= UNITS[selectedUnit].price;
+            const unit = new DefenseUnit(selectedUnit, e.latlng.lat, e.latlng.lng);
+            deployedUnits.push(unit);
+            unit.render();
             updateUI();
             selectedUnit = null;
             document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('active'));
@@ -782,42 +726,26 @@
                 if(tab === 'shop') {
                     document.getElementById('shopWindow').classList.toggle('open');
                 } else if(tab === 'stats') {
-                    alert("📊 СТАТИСТИКА\nЗбито: " + totalKills + "\nУстановок: " + deployedUnits.length + "\nАктивних дронів: " + drones.length);
-                } else if(tab === 'radar') {
-                    alert("📡 РАДАР\nАктивних цілей: " + drones.length);
+                    alert(`📊 СТАТИСТИКА\n━━━━━━━━━━━━━━━\nЗбито дронів: ${totalKills}\nАктивних установок: ${deployedUnits.length}\nДронів в небі: ${drones.length}\nБаланс: ${Math.floor(playerBalance)}₴`);
+                } else if(tab === 'help') {
+                    alert(`📖 ДОВІДКА\n━━━━━━━━━━━━━━━\n1. Відкрийте МАГАЗИН\n2. Оберіть зброю\n3. Клікніть на карті України\n4. Установки стріляють автоматично\n5. РЕБ глушить дрони в радіусі`);
                 }
             });
         });
         
-        // Регіони
-        document.querySelectorAll('.region').forEach(region => {
-            region.addEventListener('click', () => {
-                document.querySelectorAll('.region').forEach(r => r.classList.remove('active'));
-                region.classList.add('active');
-                currentRegion = region.dataset.region;
-                
-                let center = [49.0, 33.5];
-                if(currentRegion === 'kharkiv') center = [49.99, 36.23];
-                if(currentRegion === 'dnipro') center = [48.46, 35.04];
-                if(currentRegion === 'donetsk') center = [48.0, 37.8];
-                if(currentRegion === 'poltava') center = [49.59, 34.55];
-                map.setView(center, 8);
-            });
-        });
-        
-        lastFrameTime = Date.now();
-        setInterval(gameUpdate, 50);
-        setInterval(spawnDrone, 800);
-        updateUI();
-        
-        // Демо-установки для прикладу
+        // Демо-установка
         setTimeout(() => {
             if(deployedUnits.length === 0) {
                 const demo = new DefenseUnit('pickup', 49.59, 34.55);
                 deployedUnits.push(demo);
                 demo.render();
             }
-        }, 1000);
+        }, 500);
+        
+        lastFrameTime = Date.now();
+        setInterval(gameUpdate, 50);
+        setInterval(spawnDrone, 800);
+        updateUI();
     }
     
     window.onload = init;
