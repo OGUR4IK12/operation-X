@@ -22,6 +22,7 @@
             width: 100%;
             background: #0a1a2a;
         }
+        /* UI Панель */
         .game-ui {
             position: fixed;
             bottom: 20px;
@@ -86,6 +87,7 @@
         .shop-btn:hover {
             background: #00ffaa;
             color: #0a1a2a;
+            box-shadow: 0 0 15px #00ffaa;
         }
         .shop-btn.active {
             background: #00ffaa;
@@ -111,13 +113,13 @@
             z-index: 1000;
         }
         canvas#radarCanvas { width: 100%; height: 100%; border-radius: 50%; }
-        /* Кастомні стилі для маркерів-зображень */
-        .custom-marker-img {
-            filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
-            object-fit: contain;
+        
+        /* Стилі для іконок на карті */
+        .custom-icon {
+            filter: drop-shadow(0 0 4px rgba(0,255,170,0.5));
         }
-        .drone-marker img {
-            transform: rotate(180deg); /* Щоб дрони дивились вниз, якщо треба */
+        .drone-icon {
+            filter: drop-shadow(0 0 4px rgba(255,0,0,0.5));
         }
     </style>
 </head>
@@ -131,7 +133,7 @@
     <div class="stats-panel">
         <div class="stat">
             <div class="stat-label">💰 БАЛАНС</div>
-            <div class="stat-value" style="color:#ffaa44" id="balanceDisplay">10000</div>
+            <div class="stat-value" id="balanceDisplay" style="color: #ffaa44;">10000</div>
         </div>
         <div class="stat">
             <div class="stat-label">🎯 ЗБИТО</div>
@@ -143,12 +145,13 @@
         <div class="shop-btn" data-unit="shilka">⚡ Шилка<br><span style="font-size:10px">12000₴</span></div>
         <div class="shop-btn" data-unit="reb">📡 РЕБ<br><span style="font-size:10px">8000₴</span></div>
     </div>
-    <div class="warning" id="warningMsg">Оберіть юніт</div>
+    <div class="warning" id="warningMsg">Оберіть установку та клікніть на карті</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     (function(){
+        // Конфігурація юнітів з твоїми файлами
         const UNITS = {
             pickup: { name: "Пікап 12.7мм", price: 5500, range: 80, cooldown: 1800, damage: 45, color: "#ffaa44", img: "pulemet.png" },
             shilka: { name: "Шилка 23мм", price: 12000, range: 120, cooldown: 900, damage: 85, color: "#ff6644", img: "shilka.png" },
@@ -169,6 +172,7 @@
             document.getElementById('killsDisplay').innerText = totalKills;
         }
 
+        // Клас Дрона
         class Drone {
             constructor(startLat, startLng, targetCity) {
                 this.isAlive = true;
@@ -179,12 +183,12 @@
                 this.targetCity = targetCity;
                 this.progress = 0;
                 this.hp = 100;
-                this.speed = 0.012;
+                this.speed = 0.015;
                 this.marker = null;
             }
             update(dt) {
                 if(!this.isAlive) return;
-                this.progress += this.speed * dt * 0.05;
+                this.progress += this.speed * dt * 0.1;
                 if(this.progress >= 1) {
                     this.isAlive = false;
                     playerBalance = Math.max(0, playerBalance - 1500);
@@ -198,11 +202,10 @@
             render() {
                 if(!this.isAlive) return;
                 if(!this.marker) {
-                    // Використовуємо твій geran2.png
                     const icon = L.icon({
                         iconUrl: 'geran2.png',
                         iconSize: [30, 30],
-                        className: 'custom-marker-img'
+                        className: 'drone-icon'
                     });
                     this.marker = L.marker([this.currentLat, this.currentLng], { icon: icon }).addTo(map);
                 }
@@ -212,9 +215,11 @@
                 if(this.marker) map.removeLayer(this.marker);
                 totalKills++;
                 playerBalance += 800;
+                updateUI();
             }
         }
 
+        // Клас ППО
         class DefenseUnit {
             constructor(type, lat, lng) {
                 this.type = type;
@@ -230,7 +235,7 @@
                         iconUrl: this.data.img,
                         iconSize: [40, 40],
                         iconAnchor: [20, 20],
-                        className: 'custom-marker-img'
+                        className: 'custom-icon'
                     });
                     this.marker = L.marker([this.lat, this.lng], { icon: icon }).addTo(map);
                     L.circle([this.lat, this.lng], { 
@@ -244,6 +249,7 @@
             shoot(drones) {
                 if(this.data.damage <= 0 || Date.now() - this.lastShotTime < this.data.cooldown) return;
                 for(let drone of drones) {
+                    // Рахуємо дистанцію через Leaflet helper
                     let d = map.distance([this.lat, this.lng], [drone.currentLat, drone.currentLng]) / 1000;
                     if(d <= this.data.range) {
                         drone.hp -= this.data.damage;
@@ -265,7 +271,6 @@
             drones.forEach(d => d.render());
             
             deployedUnits.forEach(u => u.shoot(drones));
-            updateUI();
         }
 
         function init() {
@@ -274,13 +279,18 @@
 
             map.on('click', (e) => {
                 if(!selectedUnit) return;
+                if(!ukraineBounds.contains(e.latlng)) {
+                    document.getElementById('warningMsg').innerText = "❌ Тільки в межах України!";
+                    return;
+                }
                 if(playerBalance >= UNITS[selectedUnit].price) {
                     playerBalance -= UNITS[selectedUnit].price;
                     const u = new DefenseUnit(selectedUnit, e.latlng.lat, e.latlng.lng);
                     deployedUnits.push(u);
                     u.render();
-                    selectedUnit = null;
-                    document.querySelectorAll('.shop-btn').forEach(b => b.classList.remove('active'));
+                    updateUI();
+                } else {
+                    document.getElementById('warningMsg').innerText = "💰 Недостатньо коштів!";
                 }
             });
 
@@ -289,15 +299,21 @@
                     selectedUnit = btn.dataset.unit;
                     document.querySelectorAll('.shop-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
+                    document.getElementById('warningMsg').innerText = `📍 Розмістіть ${UNITS[selectedUnit].name}`;
                 });
             });
 
+            lastFrameTime = Date.now();
             setInterval(gameUpdate, 50);
+            
+            // Спавн дронів кожні 3.5 сек
             setInterval(() => {
-                if(drones.length < 10) {
-                    drones.push(new Drone(51, 40, {lat: 50.4, lng: 30.5}));
+                if(drones.length < 15) {
+                    const starts = [[51, 40], [46, 33], [48, 39]];
+                    const start = starts[Math.floor(Math.random()*starts.length)];
+                    drones.push(new Drone(start[0], start[1], {lat: 50.4, lng: 30.5}));
                 }
-            }, 3000);
+            }, 3500);
         }
 
         window.onload = init;
